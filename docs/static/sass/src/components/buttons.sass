@@ -1,0 +1,31 @@
+@mixin styles
+  .btn-close
+    position: absolute
+    top: .25em
+    right: .25em
+    background: transparent url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0iIzAwMCI+PHBhdGggZD0iTS4yOTMuMjkzYTEgMSAwIDAxMS40MTQgMEw4IDYuNTg2IDE0LjI5My4yOTNhMSAxIDAgMTExLjQxNCAxLjQxNEw5LjQxNCA4bDYuMjkzIDYuMjkzYTEgMSAwIDAxLTEuNDE0IDEuNDE0TDggOS40MTRsLTYuMjkzIDYuMjkzYTEgMSAwIDAxLTEuNDE0LTEuNDE0TDYuNTg2IDggLjI5MyAxLjcwN2ExIDEgMCAwMTAtMS40MTR6Ij48L3BhdGg+PC9zdmc+) center/1em auto no-repeat
+    opacity: .5
+    padding: 0.25em 0.25em
+    border: 0
+
+  .btn-close:hover
+    background: transparent url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0icmVkIj48cGF0aCBkPSJNLjI5My4yOTNhMSAxIDAgMDExLjQxNCAwTDggNi41ODYgMTQuMjkzLjI5M2ExIDEgMCAxMTEuNDE0IDEuNDE0TDkuNDE0IDhsNi4yOTMgNi4yOTNhMSAxIDAgMDEtMS40MTQgMS40MTRMOCA5LjQxNGwtNi4yOTMgNi4yOTNhMSAxIDAgMDEtMS40MTQtMS40MTRMNi41ODYgOCAuMjkzIDEuNzA3YTEgMSAwIDAxMC0xLjQxNHoiPjwvcGF0aD48L3N2Zz4=") center/1em auto no-repeat // 紅色X的圖案
+
+  .btn
+    border: 0.1rem solid transparent
+    border-radius: 0.25rem
+
+  .btn-lg
+    border: 0.1rem solid transparent
+    border-radius: 0.3rem
+    padding: 0.5rem 1rem
+    font-size: 1.25rem
+
+  .btn-orange
+    // @extend .btn // 因為設計了不同的尺寸，所以寫法要用btn btn-orange前面選尺寸，後面選顏色
+    color: #fff
+    background-color: #f4623a
+
+    &:hover
+      color: #fff
+      background-color: #c34e2e

@@ -1,0 +1,12 @@
+@mixin styles
+
+$-spacer: 1rem
+@each $i in 1, 2, 3, 4, 5, 6
+  .mt-#{$i}
+    margin-top: $-spacer * $i!important
+  .mb-#{$i}
+    margin-bottom: $-spacer * $i
+  .ms-#{$i}
+    margin-left: $-spacer * $i
+  .me-#{$i}
+    margin-right: $-spacer * $i
