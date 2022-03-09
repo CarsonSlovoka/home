@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+	"time"
 )
 
 type Config struct {
@@ -47,10 +48,13 @@ func render(src, dst string) error {
 			Funcs(funcs.GetUtilsFuncMap()).
 			ParseFiles(parseFiles...),
 	)
+	now := time.Now()
 	context := struct {
-		Version string
+		Version     string
+		LastModTime string
 	}{
 		"0.0.0",
+		now.Format("2006-01-02 15:04"),
 	}
 	return t.Execute(dstFile, context)
 }
