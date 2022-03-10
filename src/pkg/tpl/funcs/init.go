@@ -2,17 +2,16 @@ package funcs
 
 import (
 	"carson.io/pkg/tpl/funcs/compare"
-	"text/template"
 )
 
-func GetUtilsFuncMap() template.FuncMap {
+func GetUtilsFuncMap() map[string]interface{} {
 	i18nFunc := func(messageID string, templateData interface{}) string { return messageID } // Just let "i18n" and T is legal. You can override it later.
-	return template.FuncMap{
+	return map[string]interface{}{
 		"i18n": i18nFunc, "T": i18nFunc,
-		"dict":         Dict,
-		"slice":        Slice, // Let 1st char uppercase since "slice" was defined already.
-		"split":        Split,
-		"replace":      Replace,
+		"dict":    Dict,
+		"slice":   Slice, // Let 1st char uppercase since "slice" was defined already.
+		"split":   Split,
+		"replace": Replace,
 
 		// 👇 Math
 		"add":     Add,
