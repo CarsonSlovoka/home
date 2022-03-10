@@ -1,7 +1,4 @@
-{{- template "head.gohtml" }}
-<script type="module" src="./static/js/bs/components/navbar.js"></script>
-<script type="module" src="./static/js/bs/tmpl/include.js"></script>
-
+{{- template "head.gohtml" (dict "Title" "Carson-Home") }}
 {{ template "navbar.gohtml" }}
 <script type="module">
   import {debug} from './static/js/go/debug/init.js';
@@ -9,4 +6,3 @@
   console.log(debug.echo("Hello world"))
   debug.log2body("Hello world!!!")
 </script>
-
