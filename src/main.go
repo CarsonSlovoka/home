@@ -3,23 +3,36 @@ package main
 import (
 	io2 "carson.io/pkg/io"
 	"carson.io/pkg/tpl/funcs"
+	"errors"
+	"fmt"
+	htmlTemplate "html/template"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
-	"text/template"
+	textTemplate "text/template"
 	"time"
 )
 
 type Config struct {
+	*Server
 	excludeFiles []string
 }
 
-var config *Config
+type Server struct {
+	Port int
+}
+
+var (
+	config   *Config
+	chanQuit chan error
+)
 
 func init() {
 	config = &Config{
+		&Server{8888},
 		[]string{
 			`url\\static\\css\\.*\.md`,
 			`url\\static\\img\\.*\.md`,
@@ -29,6 +42,7 @@ func init() {
 			`url\\tmpl\\.*`, // 樣版在release不需要再給，已經遷入到source之中
 		},
 	}
+	chanQuit = make(chan error)
 }
 
 func render(src, dst string) error {
@@ -43,8 +57,8 @@ func render(src, dst string) error {
 		parseFiles = append(parseFiles, filepath.Join(tmplDir, filename+".gohtml"))
 	}
 
-	t := template.Must(
-		template.New(filepath.Base(src)).
+	t := textTemplate.Must(
+		textTemplate.New(filepath.Base(src)).
 			Funcs(funcs.GetUtilsFuncMap()).
 			ParseFiles(parseFiles...),
 	)
@@ -59,7 +73,7 @@ func render(src, dst string) error {
 	return t.Execute(dstFile, context)
 }
 
-func main() {
+func build() error {
 	mirrorDir := func(rootSrc string, dst string, excludeList []string) error {
 		return filepath.Walk(rootSrc, func(path string, info os.FileInfo, err error) error {
 			if info.IsDir() && (
@@ -123,14 +137,101 @@ func main() {
 			if filepath.Ext(dst) == ".gohtml" {
 				dst = dst[:len(dst)-6] + "html"
 				if err = render(src, dst); err != nil {
-					panic(err)
+					return err
 				}
 				continue
 			}
 
 			if err = io2.CopyFile(src, dst); err != nil {
-				panic(err)
+				return err
 			}
+		}
+	}
+	return nil
+}
+
+type RootDir struct {
+	http.Dir
+}
+
+func (dir *RootDir) Open(name string) (http.File, error) {
+	if filepath.Ext(name) == ".sass" {
+		return nil, errors.New(fmt.Sprintf("%d", http.StatusForbidden))
+	}
+	return dir.Dir.Open(name)
+}
+
+type RootHandler struct {
+	http.HandlerFunc
+}
+
+func (handler *RootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+	switch filepath.Ext(r.URL.Path) {
+	case ".gohtml":
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		src := filepath.Join("./url" + r.URL.Path)
+		tmplDir := "url/tmpl"
+		parseFiles := []string{src}
+		for _, filename := range []string{"head", "navbar"} {
+			parseFiles = append(parseFiles, filepath.Join(tmplDir, filename+".gohtml"))
+		}
+
+		t := htmlTemplate.Must(
+			htmlTemplate.New(filepath.Base(src)).
+				Funcs(htmlTemplate.FuncMap(funcs.GetUtilsFuncMap())).
+				ParseFiles(parseFiles...),
+		)
+		now := time.Now()
+		context := struct {
+			Version     string
+			LastModTime string
+		}{
+			"0.0.0",
+			now.Format("2006-01-02 15:04"),
+		}
+
+		if err := t.Execute(w, context); err != nil {
+			_ = fmt.Errorf("%s\n", err.Error())
+		}
+		return
+		/* // 交給http.FileServer(http.Dir()).ServeHTTP(w, r)已經會自行處理MIME_types
+		case ".js":
+			// w.Header().Set("Content-Type", "text/javascript; charset=utf-8") // Expected a JavaScript module script but the server responded with a MIME type of "
+		case ".css":
+			w.Header().Set("Content-Type", "text/css; charset=utf-8")
+		*/
+	}
+	handler.HandlerFunc(w, r)
+}
+
+func run() error {
+	mux := http.NewServeMux()
+	rootDir := &RootDir{http.Dir("./url/")}
+	rootHandler := &RootHandler{func(w http.ResponseWriter, r *http.Request) {
+		http.FileServer(rootDir).ServeHTTP(w, r)
+	}}
+
+	mux.Handle("/", rootHandler)
+	server := http.Server{Addr: fmt.Sprintf(":%d", config.Server.Port), Handler: mux}
+
+	fmt.Printf("http://localhost:%d\n", config.Server.Port)
+	if err := server.ListenAndServe(); err != nil {
+		chanQuit <- err
+		return err
+	}
+	return nil
+}
+
+func main() {
+	go startCMD(&chanQuit)
+	for {
+		select {
+		// case <-chanQuit:
+		case err := <-chanQuit:
+			log.Printf("Close App. %+v\n", err)
+			close(chanQuit)
+			return
 		}
 	}
 }
