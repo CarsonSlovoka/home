@@ -1,0 +1,13 @@
+@use 'sass:math'
+
+@mixin styles
+  $-levelList: 1 2 3 4 5 6 7 8 9 10 11 12
+  // $-unit: 100 / length($-levelList) // Using / for division is deprecated and will be removed in Dart Sass 2.0.0. 不推薦用 "/"，此方法將在2.0.0被棄用
+  $-unit: math.div(100, length($-levelList))
+  @each $i in $-levelList
+    .col-#{$i}
+      flex: 0 0 auto
+      width: $-unit * $i * 1%
+
+    .offset-#{$i}
+      margin-left: $-unit * $i * 1%

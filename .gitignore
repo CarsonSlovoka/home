@@ -1,0 +1,5 @@
+temp/
+docs/*
+src/url/static/css/styles.css
+!docs/.nojekyll
+*.exe

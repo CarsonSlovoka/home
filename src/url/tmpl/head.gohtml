@@ -1,0 +1,12 @@
+{{- /* <!DOCTYPE html> 因為我們的附檔名是gohtml，sniff不清楚這個是要用html來解析，故作明確的標示，
+另外統一加在這邊的好處，是其他gohtml頁面就不用再寫了，除非沒有template這個檔案，不然都可以
+因為瀏覽器是對整個文本內容進行解析，所以只要送到writer中寫出去的最後結果有包含DOCTYPE即可
+
+另解: 直接利用go，判斷如果是gohtml就加上header即可
+> http.ResponseWriter.Header().Set("Content-Type", "text/html; charset=utf-8")
+*/ -}}
+
+<meta charset="utf-8">
+<link rel="icon" sizes="any" type="image/svg+xml" href="/static/img/favicon.svg">
+<title>{{.Title}}</title>
+<link rel="stylesheet" href="/static/css/styles.css">

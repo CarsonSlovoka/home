@@ -1,0 +1,6 @@
+{{/* template "xxx.gohtml" (dict "Site" . "Title" "Carson-Home") */}}
+{{/* 以上的「.」 表示 t.Execute(dstFile, context) 之中的context是一個interface，不過通常是用struct比較清楚 */}}
+{{/* 注意 只有開頭大寫的變數才能被傳遞 */}}
+<title>{{.Title}}</title>
+<p>{{.Site.Version}}</p>
+<p>{{.Site.LastModTime}}</p>

@@ -31,4 +31,13 @@
 > https://github.com/CarsonSlovoka/old-home/
 
 
+
+## 本靜態網站所參考的外部package
+
+為尊重，特此申明使用到的外部包，同時感謝這群人的奉獻💕👍
+
+- [spf13/cast](https://github.com/spf13/cast/blob/8807572/caste.go#L790-L859)
+- [hugo/tpl/collections](https://github.com/gohugoio/hugo/tree/4576c82/tpl/collections)
+
+
 [搬家訊息]: https://github.com/CarsonSlovoka/CarsonSlovoka.github.io/edit/master/README.md#%E6%90%AC%E5%AE%B6%E8%A8%8A%E6%81%AF

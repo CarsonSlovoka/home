@@ -1,0 +1,26 @@
+@use "sass:list"
+
+@mixin styles
+  .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl, .container-fluid
+    width: 100%
+    padding-right: var(--bs-gutter-x, .75rem)
+    padding-left: var(--bs-gutter-x, .75rem)
+    margin-right: auto
+    margin-left: auto
+
+  // 寫的順序有差異, 當min-width=2000時，他滿足576~1400，而我們希望他只套用1400的屬性，所以1400要放在最後面，使其一一被覆蓋
+  @media (min-width: 576px)
+    .container, .container-sm
+      max-width: 540px
+  @media (min-width: 768px)
+    .container, .container-sm, .container-md
+      max-width: 720px
+  @media (min-width: 992px)
+    .container, .container-sm, .container-md, .container-lg
+      max-width: 960px
+  @media (min-width: 1200px)
+    .container, .container-sm, .container-md, .container-lg, .container-xl
+      max-width: 1140px
+  @media (min-width: 1400px)
+    .container, .container-sm, .container-md, .container-lg, .container-xl, .container-xxl
+      max-width: 1320px

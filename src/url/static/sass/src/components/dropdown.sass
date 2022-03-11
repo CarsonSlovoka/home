@@ -1,0 +1,30 @@
+@mixin styles
+  .dropdown
+    position: relative
+    display: inline-block
+
+    &:hover .dropdown-content
+      display: block
+
+  .dropdown-content
+    display: none
+    position: absolute
+    background-color: #f9f9f9
+    min-width: 5em
+    box-shadow: 0 .25rem 1rem 0 rgba(0,0,0,0.2)
+    border: 0.05rem solid rgba(0,0,0,.15)
+    border-radius: 0.25rem
+    padding: 0.75rem 1rem
+    z-index: 1000
+
+  ul.dropdown-menu
+    @extend .dropdown-content
+    padding: 0.5rem 0
+
+    & li
+      white-space: nowrap
+      padding: 0.25rem 1rem
+      margin: 0 1em
+      &:hover
+        color: var(--theme-color, #ffffff)!important
+        background-color: var(--theme-bg-color, #fc7e30)

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+{{- template "head.gohtml" }}
+{{ template "navbar.gohtml" }}
+<link rel="stylesheet" href="/static/css/styles.css">
+
+<style>
+  .row {
+    flex-direction: column;
+    align-content: center;
+  }
+
+  iframe {
+    width: 75%;
+    height: 30vh;
+  }
+</style>
+
+<body class="container">
+<div class="row">
+  <iframe src="control/ball.html"></iframe>
+</div>
+</body>
