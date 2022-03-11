@@ -168,6 +168,9 @@ type RootHandler struct {
 func (handler *RootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
 	switch filepath.Ext(r.URL.Path) {
+	case ".html":
+		r.URL.Path = r.URL.Path[:len(r.URL.Path)-4] + "gohtml" // treat all of html as gohtml
+		fallthrough
 	case ".gohtml":
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		src := filepath.Join("./url" + r.URL.Path)
