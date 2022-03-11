@@ -65,7 +65,7 @@ func render(src, dst string) error {
 
 	tmplDir := "url/tmpl"
 	parseFiles := []string{src}
-	for _, filename := range []string{"head", "navbar"} {
+	for _, filename := range []string{"head", "navbar", "body/focusOne"} {
 		parseFiles = append(parseFiles, filepath.Join(tmplDir, filename+".gohtml"))
 	}
 
@@ -181,7 +181,7 @@ func (handler *RootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		src := filepath.Join("./url" + r.URL.Path)
 		tmplDir := "url/tmpl"
 		parseFiles := []string{src}
-		for _, filename := range []string{"head", "navbar"} {
+		for _, filename := range []string{"head", "navbar", "body/focusOne"} {
 			parseFiles = append(parseFiles, filepath.Join(tmplDir, filename+".gohtml"))
 		}
 
