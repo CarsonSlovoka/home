@@ -16,7 +16,7 @@ func initBuildCmd() *flag2.Command {
 	cmd := flag2.NewCommand(flag.NewFlagSet("build", flag.ContinueOnError),
 		map[string][]flag2.CmdField{
 			"bool": {
-				{"all", true, "create gh-pages: src -> docs"},
+				{"f", false, "force. Forced overwrite of output folders"},
 			},
 			"string": {
 				{"o", "..\\docs\\", "The output directory"},
@@ -26,8 +26,18 @@ func initBuildCmd() *flag2.Command {
 		if err := cmd.Parse(args, true); err != nil {
 			return err
 		}
+		isForce := (cmd.Lookup("f")).Value.(flag.Getter).Get().(bool)
 		outputDir := (cmd.Lookup("o")).Value.(flag.Getter).Get().(string)
-		return build(outputDir)
+		if !isForce {
+			if _, err := os.Stat(outputDir); !os.IsNotExist(err) {
+				return errors.New(fmt.Sprintf("the directory (%s) exists already", outputDir))
+			}
+		}
+		fmt.Println("Start build...")
+		err := build(outputDir)
+		fmt.Println("End build")
+		return err
+
 	}
 	return cmd
 }
