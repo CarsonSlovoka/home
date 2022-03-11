@@ -1,0 +1,36 @@
+<!DOCTYPE html><meta charset="utf-8">
+<link rel="icon" sizes="any" type="image/svg+xml" href="/static/img/favicon.svg">
+<title>Ball SVG</title>
+<link rel="stylesheet" href="/static/css/styles.css">
+
+
+<style>
+  svg {
+    height: 20vh;
+  }
+</style>
+
+<header>
+  <h1>立體球</h1>
+</header>
+<body>
+<input type="color" id="color-picker" value="#00ff00" title="Choose your color">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="r1" cx=".3" cy=".3" r=".7">
+      <stop id="stop-1" offset="0%" stop-color="white"></stop>
+      <stop id="stop-2" offset="30%" stop-color="#9f9"></stop>
+      <stop id="stop-3" offset="70%" stop-color="#373"></stop>
+      <stop id="stop-4" offset="100%" stop-color="black"></stop>
+    </radialGradient>
+  </defs>
+  <circle cx="50" cy="50" r="25" fill="url(#r1)"/>
+</svg>
+</body>
+
+<script>
+  const dqs = (name) => document.querySelector(name)
+  dqs(`#color-picker`).onchange = (e) => {
+    dqs(`#stop-1`).setAttribute("stop-color", e.target.value)
+  }
+</script>
