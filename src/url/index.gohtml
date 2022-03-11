@@ -1,5 +1,5 @@
 {{- template "head.gohtml" (dict "Title" "Carson-Home") }}
-{{ template "navbar.gohtml" }}
+{{ template "navbar.gohtml" . }}
 <script type="module">
   import {debug} from './static/js/go/debug/init.js';
 

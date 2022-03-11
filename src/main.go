@@ -19,6 +19,13 @@ import (
 type Config struct {
 	*Server
 	excludeFiles []string
+	*SiteContext
+}
+
+type SiteContext struct {
+	Title       string
+	Version     string
+	LastModTime string
 }
 
 type Server struct {
@@ -31,6 +38,7 @@ var (
 )
 
 func init() {
+	now := time.Now()
 	config = &Config{
 		&Server{8888},
 		[]string{
@@ -40,6 +48,10 @@ func init() {
 			`url\\static\\js\\.*\.md`,
 			`url\\static\\sass\\.*`,
 			`url\\tmpl\\.*`, // 樣版在release不需要再給，已經遷入到source之中
+		}, &SiteContext{
+			"Carson-Blog",
+			"0.0.0",
+			now.Format("2006-01-02 15:04"),
 		},
 	}
 	chanQuit = make(chan error)
@@ -62,15 +74,7 @@ func render(src, dst string) error {
 			Funcs(funcs.GetUtilsFuncMap()).
 			ParseFiles(parseFiles...),
 	)
-	now := time.Now()
-	context := struct {
-		Version     string
-		LastModTime string
-	}{
-		"0.0.0",
-		now.Format("2006-01-02 15:04"),
-	}
-	return t.Execute(dstFile, context)
+	return t.Execute(dstFile, config.SiteContext)
 }
 
 func build(outputDir string) error {
@@ -186,16 +190,8 @@ func (handler *RootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				Funcs(htmlTemplate.FuncMap(funcs.GetUtilsFuncMap())).
 				ParseFiles(parseFiles...),
 		)
-		now := time.Now()
-		context := struct {
-			Version     string
-			LastModTime string
-		}{
-			"0.0.0",
-			now.Format("2006-01-02 15:04"),
-		}
 
-		if err := t.Execute(w, context); err != nil {
+		if err := t.Execute(w, config.SiteContext); err != nil {
 			_ = fmt.Errorf("%s\n", err.Error())
 		}
 		return
