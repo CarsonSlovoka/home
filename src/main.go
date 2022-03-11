@@ -73,7 +73,7 @@ func render(src, dst string) error {
 	return t.Execute(dstFile, context)
 }
 
-func build() error {
+func build(outputDir string) error {
 	mirrorDir := func(rootSrc string, dst string, excludeList []string) error {
 		return filepath.Walk(rootSrc, func(path string, info os.FileInfo, err error) error {
 			if info.IsDir() && (
@@ -121,7 +121,7 @@ func build() error {
 
 	var err error
 	{ // Copy Dir only
-		if err = mirrorDir("url\\", "..\\docs\\", []string{
+		if err = mirrorDir("url\\", outputDir, []string{
 			"url\\pkg",
 			"url\\static\\sass",
 		}); err != nil {
@@ -132,7 +132,8 @@ func build() error {
 	{ // and then copy file
 		filePathList, _ := collectFiles("url\\", config.excludeFiles)
 		for _, src := range filePathList {
-			dst := filepath.Join("../docs/", strings.Replace(src, "url\\", "", 1))
+			// dst := filepath.Join("../docs/", strings.Replace(src, "url\\", "", 1)) // filepath.Join反斜線會自動修正，所以這樣也可以
+			dst := filepath.Join(outputDir, strings.Replace(src, "url\\", "", 1))
 			// fmt.Println(dst)
 			if filepath.Ext(dst) == ".gohtml" {
 				dst = dst[:len(dst)-6] + "html"

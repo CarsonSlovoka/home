@@ -18,9 +18,16 @@ func initBuildCmd() *flag2.Command {
 			"bool": {
 				{"all", true, "create gh-pages: src -> docs"},
 			},
+			"string": {
+				{"o", "..\\docs\\", "The output directory"},
+			},
 		})
 	cmd.MainFunc = func(args []string) error {
-		return build()
+		if err := cmd.Parse(args, true); err != nil {
+			return err
+		}
+		outputDir := (cmd.Lookup("o")).Value.(flag.Getter).Get().(string)
+		return build(outputDir)
 	}
 	return cmd
 }
