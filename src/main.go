@@ -57,17 +57,32 @@ func init() {
 	chanQuit = make(chan error)
 }
 
+func getParseFiles(src, tmplDir string) []string {
+	parseFiles := []string{src} // 除了tmpl以外，該文件本身也要加入
+	/*
+		for _, filename := range []string{"head", "navbar", "body/focusOne"} {
+			parseFiles = append(parseFiles, filepath.Join(tmplDir, filename+".gohtml"))
+		}
+	*/
+	if err := filepath.Walk(tmplDir, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() || filepath.Ext(path) != ".gohtml" {
+			return nil
+		}
+		parseFiles = append(parseFiles, path)
+		return nil
+	}); err != nil {
+		panic(err)
+	}
+	return parseFiles
+}
+
 func render(src, dst string) error {
 	dstFile, err := os.Create(dst)
 	if err != nil {
 		return err
 	}
 
-	tmplDir := "url/tmpl"
-	parseFiles := []string{src}
-	for _, filename := range []string{"head", "navbar", "body/focusOne"} {
-		parseFiles = append(parseFiles, filepath.Join(tmplDir, filename+".gohtml"))
-	}
+	parseFiles := getParseFiles(src, "url/tmpl")
 
 	t := textTemplate.Must(
 		textTemplate.New(filepath.Base(src)).
@@ -179,11 +194,8 @@ func (handler *RootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case ".gohtml":
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		src := filepath.Join("./url" + r.URL.Path)
-		tmplDir := "url/tmpl"
-		parseFiles := []string{src}
-		for _, filename := range []string{"head", "navbar", "body/focusOne"} {
-			parseFiles = append(parseFiles, filepath.Join(tmplDir, filename+".gohtml"))
-		}
+
+		parseFiles := getParseFiles(src, "url/tmpl")
 
 		t := htmlTemplate.Must(
 			htmlTemplate.New(filepath.Base(src)).
