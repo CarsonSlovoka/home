@@ -5,6 +5,7 @@
   svg {
     width: 500px;
     height: 500px;
+    border: 1px dashed gray;
   }
 </style>
 
@@ -29,6 +30,11 @@
     <input type="color" class="color-picker" data-id="4" value="#000000" title="Choose your color">
   </div>
 
+  <div>
+    <h3>Rotate</h3>
+    <p>Right mouse button - rotate</p>
+  </div>
+
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
     <defs>
       <radialGradient id="r1" cx=".3" cy=".3" r=".7">
@@ -38,7 +44,9 @@
         <stop id="stop-4" offset="100%" stop-color="black"></stop>
       </radialGradient>
     </defs>
-    <circle cx="50" cy="50" r="25" fill="url(#r1)"/>
+    <circle cx="50" cy="50" r="25" fill="url(#r1)"
+            transform="rotate(0 50 50)" {{- /* (degrees x y)  x, y指的是要用哪一個座標點當作基準去旋轉，預設是0,0 */ -}}
+    />
   </svg>
 {{end -}}
 
@@ -46,10 +54,47 @@
 
   const dqs = (name) => document.querySelector(name);
 
+  function initRotateBehavior() {
+    let isRotating = false
+    const svg = dqs(`svg`)
+    svg.addEventListener("mousedown", (e) => {
+      if (e.button !== 2) { // 2: right button
+        return
+      }
+      isRotating = true
+    })
+
+    svg.addEventListener("mouseup", () => {
+      isRotating = false
+    })
+
+    svg.addEventListener("mousemove", (e) => {
+      if (!isRotating) {
+        return
+      }
+      /* Deprecated. Use DOMPoint or DOMPointReadOnly instead.
+      const pt = svg.createSVGPoint()
+      pt.x = e.clientX
+      pt.y = e.clientY
+      pt.matrixTransform(svg.getScreenCTM().inverse())
+       */
+      const domPoint = new DOMPointReadOnly(e.clientX, e.clientY);
+      const loc = domPoint.matrixTransform(svg.getScreenCTM().inverse())
+      const [x1, y1] = [loc.x, loc.y]
+      const [cx, cy] = [50, 50]
+      const degrees = Math.atan2(y1 - cy, x1 - cx) * 180 / Math.PI
+      const circle = svg.querySelector(`circle`)
+      circle.setAttribute("transform", `rotate(${degrees} 50 50)`)
+    })
+  }
+
   [...document.querySelectorAll(`input[class="color-picker"]`)].forEach(inputElem => {
     inputElem.onchange = (e) => {
       const stopElem = dqs(`#stop-${inputElem.dataset.id}`)
       stopElem.setAttribute("stop-color", inputElem.value)
     }
   })
+
+  document.body.oncontextmenu = () => false // 不要顯示右鍵菜單
+  initRotateBehavior()
 </script>
