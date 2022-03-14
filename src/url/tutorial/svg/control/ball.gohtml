@@ -14,7 +14,21 @@
     <h1>立體球</h1>
   </header>
 
-  <input type="color" id="color-picker" value="#00ff00" title="Choose your color">
+  <div>
+    <h3>Stop Color</h3>
+    <label>1</label>
+    <input type="color" class="color-picker" data-id="1" value="#ffffff" title="Choose your color">
+
+    <label>2</label>
+    <input type="color" class="color-picker" data-id="2" value="#99ff99" title="Choose your color">
+
+    <label>3</label>
+    <input type="color" class="color-picker" data-id="3" value="#337733" title="Choose your color">
+
+    <label>4</label>
+    <input type="color" class="color-picker" data-id="4" value="#000000" title="Choose your color">
+  </div>
+
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
     <defs>
       <radialGradient id="r1" cx=".3" cy=".3" r=".7">
@@ -29,8 +43,13 @@
 {{end -}}
 
 <script>
-  const dqs = (name) => document.querySelector(name)
-  dqs(`#color-picker`).onchange = (e) => {
-    dqs(`#stop-1`).setAttribute("stop-color", e.target.value)
-  }
+
+  const dqs = (name) => document.querySelector(name);
+
+  [...document.querySelectorAll(`input[class="color-picker"]`)].forEach(inputElem => {
+    inputElem.onchange = (e) => {
+      const stopElem = dqs(`#stop-${inputElem.dataset.id}`)
+      stopElem.setAttribute("stop-color", inputElem.value)
+    }
+  })
 </script>
