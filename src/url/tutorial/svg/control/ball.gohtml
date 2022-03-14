@@ -7,12 +7,16 @@
     height: 500px;
     border: 1px dashed gray;
   }
+
+  label {
+    font-family: 'Courier New', monospace; {{/* 為了讓&nbsp;不受到Proportional的影響，所以都改成定距字，使的寬度都相同 */}}
+  }
 </style>
 
 {{- template "focusOne.gohtml" . }}
 {{define "body" }}
   <header>
-    <h1>立體球</h1>
+    <h1 style="margin:0">立體球</h1>
   </header>
 
   <div>
@@ -35,6 +39,25 @@
     <p>Right mouse button - rotate</p>
   </div>
 
+  <div>
+    <h3>circle x, circle y, radius</h3>
+    <label>CX
+      <input id="inputCx" type="range" min="0" max="1" step="0.01" value="0.3" aria-label=""
+             oninput="this.nextElementSibling.value = this.value">
+      <output>0.3</output>
+    </label><br>
+    <label>CY
+      <input id="inputCy" type="range" min="0" max="1" step="0.01" value="0.3" aria-label=""
+             oninput="this.nextElementSibling.value = this.value">
+      <output>0.3</output>
+    </label><br>
+    <label>R&nbsp;
+      <input id="inputR" type="range" min="0" max="1" step="0.01" value="0.7" aria-label=""
+             oninput="this.nextElementSibling.value = this.value">
+      <output>0.7</output>
+    </label>
+  </div>
+
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
     <defs>
       <radialGradient id="r1" cx=".3" cy=".3" r=".7">
@@ -53,10 +76,10 @@
 <script>
 
   const dqs = (name) => document.querySelector(name);
+  const svg = dqs(`svg`)
 
   function initRotateBehavior() {
     let isRotating = false
-    const svg = dqs(`svg`)
     svg.addEventListener("mousedown", (e) => {
       if (e.button !== 2) { // 2: right button
         return
@@ -97,4 +120,8 @@
 
   document.body.oncontextmenu = () => false // 不要顯示右鍵菜單
   initRotateBehavior()
+
+  dqs(`#inputCx`).onchange = (e) => svg.querySelector(`radialGradient`).setAttribute("cx", e.target.value)
+  dqs(`#inputCy`).onchange = (e) => svg.querySelector(`radialGradient`).setAttribute("cy", e.target.value)
+  dqs(`#inputR`).onchange = (e) => svg.querySelector(`radialGradient`).setAttribute("r", e.target.value)
 </script>
