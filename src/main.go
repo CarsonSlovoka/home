@@ -225,7 +225,8 @@ func run() error {
 	}}
 
 	mux.Handle("/", rootHandler)
-	server := http.Server{Addr: fmt.Sprintf(":%d", config.Server.Port), Handler: mux}
+	// server := http.Server{Addr: fmt.Sprintf(":%d", config.Server.Port), Handler: mux}
+	server := http.Server{Addr: fmt.Sprintf("127.0.0.1:%d", config.Server.Port), Handler: mux} // 純本機，連內網都不給連，好處是不會有防火牆來阻擋
 
 	fmt.Printf("http://localhost:%d\n", config.Server.Port)
 	if err := server.ListenAndServe(); err != nil {
