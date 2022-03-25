@@ -95,16 +95,15 @@ func render(src, dst string) error {
 func build(outputDir string) error {
 	mirrorDir := func(rootSrc string, dst string, excludeList []string) error {
 		return filepath.Walk(rootSrc, func(path string, info os.FileInfo, err error) error {
-			if info.IsDir() && (
-				path != rootSrc &&
-					func(curPath string) bool { // filter
-						for _, excludeItem := range excludeList {
-							if strings.HasPrefix(curPath, excludeItem) {
-								return false
-							}
+			if info.IsDir() && (path != rootSrc &&
+				func(curPath string) bool { // filter
+					for _, excludeItem := range excludeList {
+						if strings.HasPrefix(curPath, excludeItem) {
+							return false
 						}
-						return true
-					}(path)) {
+					}
+					return true
+				}(path)) {
 
 				dstPath := filepath.Join(dst, strings.Replace(path, rootSrc, "", 1))
 				// fmt.Println(dstPath)
