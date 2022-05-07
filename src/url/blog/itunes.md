@@ -26,3 +26,9 @@
 ```
 
 等更新完畢之後再啟用即可(指紋可能要重壓)
+
+## itunes[下載檔案的位置](https://apple.stackexchange.com/a/49406/403361)
+
+更新檔通常都好幾GB，而且也不會自動砍掉，有需要了話要自己去以下位子刪除
+
+> %userprofile%\AppData\Local\Packages\AppleInc.iTunes_nzyj5cx40ttqa\LocalCache\Roaming\Apple Computer\iTunes\iPhone Software Updates
