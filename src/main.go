@@ -6,6 +6,7 @@ import (
 	"fmt"
 	htmlTemplate "html/template"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -39,7 +40,7 @@ var (
 func init() {
 	now := time.Now()
 	config = &Config{
-		&Server{8888},
+		&Server{0}, // port為0可以自動找尋沒有被使用到的port
 		[]string{
 			`url\\static\\css\\.*\.md`,
 			`url\\static\\img\\.*\.md`,
@@ -215,10 +216,21 @@ func run() error {
 	// server := http.Server{Addr: fmt.Sprintf(":%d", config.Server.Port), Handler: mux}
 	server := http.Server{Addr: fmt.Sprintf("127.0.0.1:%d", config.Server.Port), Handler: mux} // 純本機，連內網都不給連，好處是不會有防火牆來阻擋
 
-	fmt.Printf("http://localhost:%d\n", config.Server.Port)
-	if err := server.ListenAndServe(); err != nil {
-		chanQuit <- err
-		return err
+	{ // server.ListenAndServer (單獨分離出來寫，是為了得到當前所使用的port
+		addr := server.Addr
+		if addr == "" {
+			addr = ":http"
+		}
+		ln, err := net.Listen("tcp", addr)
+		fmt.Printf("http://localhost:%d\n", ln.Addr().(*net.TCPAddr).Port)
+
+		if err != nil {
+			return err
+		}
+		if err = server.Serve(ln); err != nil {
+			chanQuit <- err
+			return err
+		}
 	}
 	return nil
 }
