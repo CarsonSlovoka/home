@@ -3,7 +3,6 @@ package main
 import (
 	io2 "carson.io/pkg/io"
 	"carson.io/pkg/tpl/funcs"
-	"errors"
 	"fmt"
 	htmlTemplate "html/template"
 	"log"
@@ -175,61 +174,44 @@ func build(outputDir string) error {
 	return nil
 }
 
-type RootDir struct {
-	http.Dir
-}
+func run() error {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		rootDir := http.Dir("./url/")
+		curFilepath := filepath.Join(string(rootDir), r.URL.Path)
+		extName := filepath.Ext(curFilepath)
+		switch extName {
+		case ".sass":
+			w.WriteHeader(http.StatusForbidden) // 如果直接返回, status沒有註明，得到的會是一個空頁面(會不曉得對錯)
+			return
+		case ".html":
+			r.URL.Path = r.URL.Path[:len(r.URL.Path)-4] + "gohtml" // treat all of html as gohtml
+			fallthrough
+		case ".gohtml":
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			src := filepath.Join(string(rootDir), r.URL.Path)
+			parseFiles := getParseFiles(src, "url/tmpl")
 
-func (dir *RootDir) Open(name string) (http.File, error) {
-	if filepath.Ext(name) == ".sass" {
-		return nil, errors.New(fmt.Sprintf("%d", http.StatusForbidden))
-	}
-	return dir.Dir.Open(name)
-}
+			t := htmlTemplate.Must(
+				htmlTemplate.New(filepath.Base(src)).
+					Funcs(htmlTemplate.FuncMap(funcs.GetUtilsFuncMap())).
+					ParseFiles(parseFiles...),
+			)
 
-type RootHandler struct {
-	http.HandlerFunc
-}
-
-func (handler *RootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
-	switch filepath.Ext(r.URL.Path) {
-	case ".html":
-		r.URL.Path = r.URL.Path[:len(r.URL.Path)-4] + "gohtml" // treat all of html as gohtml
-		fallthrough
-	case ".gohtml":
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		src := filepath.Join("./url" + r.URL.Path)
-
-		parseFiles := getParseFiles(src, "url/tmpl")
-
-		t := htmlTemplate.Must(
-			htmlTemplate.New(filepath.Base(src)).
-				Funcs(htmlTemplate.FuncMap(funcs.GetUtilsFuncMap())).
-				ParseFiles(parseFiles...),
-		)
-
-		if err := t.Execute(w, config.SiteContext); err != nil {
-			_ = fmt.Errorf("%s\n", err.Error())
-		}
-		return
-		/* // 交給http.FileServer(http.Dir()).ServeHTTP(w, r)已經會自行處理MIME_types
+			if err := t.Execute(w, config.SiteContext); err != nil {
+				log.Printf("%s\n", err.Error())
+			}
+		/* 交給http.FileServer(http.Dir()).ServeHTTP(w, r)已經會自行處理MIME_types
 		case ".js":
 			// w.Header().Set("Content-Type", "text/javascript; charset=utf-8") // Expected a JavaScript module script but the server responded with a MIME type of "
 		case ".css":
 			w.Header().Set("Content-Type", "text/css; charset=utf-8")
 		*/
-	}
-	handler.HandlerFunc(w, r)
-}
+		default:
+			http.FileServer(rootDir).ServeHTTP(w, r)
+		}
+	})
 
-func run() error {
-	mux := http.NewServeMux()
-	rootDir := &RootDir{http.Dir("./url/")}
-	rootHandler := &RootHandler{func(w http.ResponseWriter, r *http.Request) {
-		http.FileServer(rootDir).ServeHTTP(w, r)
-	}}
-
-	mux.Handle("/", rootHandler)
 	// server := http.Server{Addr: fmt.Sprintf(":%d", config.Server.Port), Handler: mux}
 	server := http.Server{Addr: fmt.Sprintf("127.0.0.1:%d", config.Server.Port), Handler: mux} // 純本機，連內網都不給連，好處是不會有防火牆來阻擋
 
