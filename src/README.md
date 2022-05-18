@@ -12,7 +12,18 @@
 - 使用`run`以本機當成server，能直接瀏覽網頁查看結果
 - `quit` : 離開程式
 
-## 開發注意事項
+## 開發相關
+
+### build簡介
+
+複製[src/url](https://github.com/CarsonSlovoka/CarsonSlovoka.github.io/tree/fe36034/src/url)的內容<sup>會排除不需要的，如`sass`, `pkg`</sup>到輸出資料夾
+
+其中遇到`gohtml`的檔案，會使用`text/template`進行渲染
+
+> 以[src/url/tmpl](https://github.com/CarsonSlovoka/CarsonSlovoka.github.io/tree/fe36034/src/url/tmpl)<sup>含其所有**子**資料夾</sup>
+> 當作`ParseFiles`的內容(當然該內容本身也必須涵蓋當前的目標檔案本身)
+
+### 注意事項
 
 - 所有的html附檔名都請改用gohtml
 

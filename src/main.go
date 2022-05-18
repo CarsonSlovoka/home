@@ -93,48 +93,54 @@ func render(src, dst string) error {
 }
 
 func build(outputDir string) error {
-	mirrorDir := func(rootSrc string, dst string, excludeList []string) error {
-		return filepath.Walk(rootSrc, func(path string, info os.FileInfo, err error) error {
-			if info.IsDir() && (path != rootSrc &&
-				func(curPath string) bool { // filter
-					for _, excludeItem := range excludeList {
-						if strings.HasPrefix(curPath, excludeItem) {
-							return false
+	var (
+		mirrorDir    func(rootSrc string, dst string, excludeList []string) error
+		collectFiles func(dir string, excludeList []string) (fileList []string, err error)
+	)
+	{ // init function
+		mirrorDir = func(rootSrc string, dst string, excludeList []string) error {
+			return filepath.Walk(rootSrc, func(path string, info os.FileInfo, err error) error {
+				if info.IsDir() && (path != rootSrc &&
+					func(curPath string) bool { // filter
+						for _, excludeItem := range excludeList {
+							if strings.HasPrefix(curPath, excludeItem) {
+								return false
+							}
 						}
+						return true
+					}(path)) {
+
+					dstPath := filepath.Join(dst, strings.Replace(path, rootSrc, "", 1))
+					// fmt.Println(dstPath)
+					if err = os.MkdirAll(dstPath, os.FileMode(666)); err != nil {
+						return err
 					}
-					return true
-				}(path)) {
-
-				dstPath := filepath.Join(dst, strings.Replace(path, rootSrc, "", 1))
-				// fmt.Println(dstPath)
-				if err = os.MkdirAll(dstPath, os.FileMode(666)); err != nil {
-					return err
 				}
-			}
-			return nil
-		})
-	}
-
-	collectFiles := func(dir string, excludeList []string) (fileList []string, err error) {
-		err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-			if info.IsDir() {
 				return nil
-			}
-
-			if regexp.MustCompile(strings.Join(excludeList, "|")).Match([]byte(path)) {
-				// fmt.Printf("%s\n", path)
-				return nil
-			}
-
-			// fmt.Println(path)
-			fileList = append(fileList, path)
-			return nil
-		})
-		if err != nil {
-			log.Fatalf("walk error [%v]\n", err)
-			return nil, err
+			})
 		}
-		return fileList, nil
+
+		collectFiles = func(dir string, excludeList []string) (fileList []string, err error) {
+			err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+				if info.IsDir() {
+					return nil
+				}
+
+				if regexp.MustCompile(strings.Join(excludeList, "|")).Match([]byte(path)) {
+					// fmt.Printf("%s\n", path)
+					return nil
+				}
+
+				// fmt.Println(path)
+				fileList = append(fileList, path)
+				return nil
+			})
+			if err != nil {
+				log.Fatalf("walk error [%v]\n", err)
+				return nil, err
+			}
+			return fileList, nil
+		}
 	}
 
 	var err error
