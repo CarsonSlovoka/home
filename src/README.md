@@ -25,7 +25,9 @@
 
 ### 注意事項
 
-- 所有的html附檔名都請改用gohtml
+- [所有的html附檔名都請改用gohtml](https://github.com/CarsonSlovoka/CarsonSlovoka.github.io/blob/461cbcc4889d35542f222eec54102c7b5992e373/src/main.go#L188-L194)
+
+  這是因為超連結的設定也是使用正常的html，如果把html只當作一般頁面，src依然是寫.html，它就會不曉得到底是該.gohtml還是.html
 
 ## 如何發佈到gh-pages
 
