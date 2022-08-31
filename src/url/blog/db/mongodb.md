@@ -4,9 +4,9 @@
 
 需要安裝:
 
-- mongoD: server運行環境
-- mongosh: shell環境
-- Compass (可選): 這個提供良好的可視化結果，建議可以啟動`mongodb\bin\Install-Compass.ps1`(powershell)來安裝它
+- mongoD.exe: server運行環境
+- mongosh.exe: shell環境
+- mongodb-Compass.exe (可選): 這個提供良好的可視化結果，建議可以啟動`mongodb\bin\Install-Compass.ps1`(powershell)來安裝它
 
 ### mongoD安裝
 
@@ -54,7 +54,7 @@ DBException in initAndListen, terminating","attr":{"error":"NonExistentPath: Dat
 
 至此您已經安裝好了mongod
 
-### Monghsh安裝
+### MongoSh安裝
 
 > https://www.mongodb.com/try/download/shell
 
@@ -68,7 +68,7 @@ Package: zip
 
 測試: 打開cmd，執行mongosh.exe
 
-### Compass安裝
+### mongodb-Compass安裝
 
 有兩種安裝方法:
 
@@ -125,6 +125,21 @@ URI設定
 ```yaml
 mongodb://localhost:27017 # 區網
 mongodb://127.0.0.1:27017 # 純本機
+```
+
+### 環境變數
+
+我會建議先新增一個屬於MongoDB的環境變數之後再把此變數加到Path去，而不是直接開啟Path增加
+
+這樣日後如果有要異動只需要更改MongoDB的變數內容即可
+
+```yaml
+# SETX 可以永久更改
+# /M表示寫在Machine之中 ，有多個路徑可以用;隔開
+SETX /M Mongo "%ProgramFiles%\Mongo;%programFiles%\Mongo\mongodb-win32-x86_64-windows-6.0.1\bin;%ProgramFiles%\Mongo\mongosh-1.5.4-win32-x64\bin;"
+# 放置變數到PATH之後
+SETX /M PATH "%PATH%;%Mongo%"
+# 如果太長會被截段，建議還是手動加)
 ```
 
 ### 教學影片
