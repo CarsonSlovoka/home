@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 	textTemplate "text/template"
 	"time"
 )
@@ -175,7 +176,7 @@ func build(outputDir string) error {
 	return nil
 }
 
-func run() error {
+func BuildServer(isLocalMode bool) (server *http.Server, listener net.Listener) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		rootDir := http.Dir("./url/")
@@ -213,37 +214,25 @@ func run() error {
 		}
 	})
 
-	// server := http.Server{Addr: fmt.Sprintf(":%d", config.Server.Port), Handler: mux}
-	server := http.Server{Addr: fmt.Sprintf("127.0.0.1:%d", config.Server.Port), Handler: mux} // 純本機，連內網都不給連，好處是不會有防火牆來阻擋
-
-	{ // server.ListenAndServer (單獨分離出來寫，是為了得到當前所使用的port
-		addr := server.Addr
-		if addr == "" {
-			addr = ":http"
-		}
-		ln, err := net.Listen("tcp", addr)
-		fmt.Printf("http://localhost:%d\n", ln.Addr().(*net.TCPAddr).Port)
-
-		if err != nil {
-			return err
-		}
-		if err = server.Serve(ln); err != nil {
-			chanQuit <- err
-			return err
-		}
+	if isLocalMode {
+		server = &http.Server{Addr: fmt.Sprintf("127.0.0.1:%d", config.Server.Port), Handler: mux}
+	} else {
+		server = &http.Server{Addr: fmt.Sprintf(":%d", config.Server.Port), Handler: mux}
 	}
-	return nil
+
+	var err error
+	listener, err = net.Listen("tcp", server.Addr)
+	if err != nil {
+		panic(err)
+	}
+
+	return server, listener
 }
 
 func main() {
-	go startCMD(&chanQuit)
-	for {
-		select {
-		// case <-chanQuit:
-		case err := <-chanQuit:
-			log.Printf("Close App. %+v\n", err)
-			close(chanQuit)
-			return
-		}
-	}
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go startCMD(&wg)
+	wg.Wait()
+	log.Printf("Close App.")
 }
