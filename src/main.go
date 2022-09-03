@@ -2,8 +2,8 @@ package main
 
 import (
 	io2 "carson.io/pkg/io"
-	"carson.io/pkg/tpl/funcs"
 	"fmt"
+	"github.com/CarsonSlovoka/go-pkg/v2/tpl/funcs"
 	htmlTemplate "html/template"
 	"log"
 	"net"
