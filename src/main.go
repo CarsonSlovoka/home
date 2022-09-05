@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -156,15 +157,59 @@ func BuildServer(isLocalMode bool) (server *http.Server, listener net.Listener) 
 		curFilepath := filepath.Join(string(rootDir), r.URL.Path)
 		extName := filepath.Ext(curFilepath)
 		switch extName {
+		case ".js":
+			w.Header().Set("Content-Type", "application/javascript; charset=utf-8") // 預設的js用的text/javascript
+			http.FileServer(rootDir).ServeHTTP(w, r)
+			return
 		case ".sass":
 			w.WriteHeader(http.StatusForbidden) // 如果直接返回, status沒有註明，得到的會是一個空頁面(會不曉得對錯)
 			return
+		case "":
+			for {
+				// 1. 省略.html
+				if _, err := os.Stat(curFilepath + ".gohtml"); !os.IsNotExist(err) {
+					/* 不需要增加額外的計算
+					if strings.HasSuffix(r.URL.Path, "/") {
+						r.URL.Path = strings.TrimSuffix(r.URL.Path, "/") // 這個會影響到path.Dir，Dir(main/abc/) => main/abc  Dir(main/abc) => main/
+					}
+					r.URL.Path = path.Join(path.Dir(r.URL.Path), path.Base(r.URL.Path)+".html")
+					*/
+					if strings.HasSuffix(r.URL.Path, "/") {
+						r.URL.Path = r.URL.Path[:len(r.URL.Path)-1] + ".html"
+					} else {
+						r.URL.Path += ".html"
+					}
+					break
+				}
+
+				// 訪問預設的index.html
+				defaultIndexPage := path.Join(curFilepath, "index.gohtml")
+				if _, err = os.Stat(defaultIndexPage); !os.IsNotExist(err) {
+					// 讓其訪問預設的index.html
+					r.URL.Path = path.Join(r.URL.Path, "index.gohtml")
+					break
+				}
+
+				// 其他狀況
+				http.FileServer(rootDir).ServeHTTP(w, r)
+				return
+			}
+			fallthrough
 		case ".html":
-			r.URL.Path = r.URL.Path[:len(r.URL.Path)-4] + "gohtml" // treat all of html as gohtml
+			if !strings.HasSuffix(r.URL.Path, ".gohtml") {
+				r.URL.Path = r.URL.Path[:len(r.URL.Path)-4] + "gohtml" // treat all of html as gohtml
+			}
 			fallthrough
 		case ".gohtml":
-			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			src := filepath.Join(string(rootDir), r.URL.Path)
+
+			if _, err := os.Stat(src); os.IsNotExist(err) {
+				log.Println(err)
+				return
+			}
+
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
 			var parseFiles []string
 			parseFiles, err = template.GetAllTmplName(os.ReadFile, src, tmplFiles)
 			parseFiles = append(parseFiles, src)
