@@ -3,14 +3,15 @@ package main
 import (
 	io2 "carson.io/pkg/io"
 	"fmt"
+	filepath2 "github.com/CarsonSlovoka/go-pkg/v2/path/filepath"
 	"github.com/CarsonSlovoka/go-pkg/v2/tpl/funcs"
+	"github.com/CarsonSlovoka/go-pkg/v2/tpl/template"
 	htmlTemplate "html/template"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"sync"
 	textTemplate "text/template"
@@ -58,32 +59,17 @@ func init() {
 	chanQuit = make(chan error)
 }
 
-func getParseFiles(src, tmplDir string) []string {
-	parseFiles := []string{src} // 除了tmpl以外，該文件本身也要加入
-	/*
-		for _, filename := range []string{"head", "navbar", "body/focusOne"} {
-			parseFiles = append(parseFiles, filepath.Join(tmplDir, filename+".gohtml"))
-		}
-	*/
-	if err := filepath.Walk(tmplDir, func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() || filepath.Ext(path) != ".gohtml" {
-			return nil
-		}
-		parseFiles = append(parseFiles, path)
-		return nil
-	}); err != nil {
-		panic(err)
-	}
-	return parseFiles
-}
-
-func render(src, dst string) error {
+func render(src, dst string, tmplFiles []string) error {
 	dstFile, err := os.Create(dst)
 	if err != nil {
 		return err
 	}
 
-	parseFiles := getParseFiles(src, "url/tmpl")
+	parseFiles, err := template.GetAllTmplName(os.ReadFile, src, tmplFiles)
+	if err != nil {
+		return err
+	}
+	parseFiles = append(parseFiles, src)
 
 	t := textTemplate.Must(
 		textTemplate.New(filepath.Base(src)).
@@ -95,8 +81,7 @@ func render(src, dst string) error {
 
 func build(outputDir string) error {
 	var (
-		mirrorDir    func(rootSrc string, dst string, excludeList []string) error
-		collectFiles func(dir string, excludeList []string) (fileList []string, err error)
+		mirrorDir func(rootSrc string, dst string, excludeList []string) error
 	)
 	{ // init function
 		mirrorDir = func(rootSrc string, dst string, excludeList []string) error {
@@ -120,33 +105,10 @@ func build(outputDir string) error {
 				return nil
 			})
 		}
-
-		collectFiles = func(dir string, excludeList []string) (fileList []string, err error) {
-			err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-				if info.IsDir() {
-					return nil
-				}
-
-				if regexp.MustCompile(strings.Join(excludeList, "|")).Match([]byte(path)) {
-					// fmt.Printf("%s\n", path)
-					return nil
-				}
-
-				// fmt.Println(path)
-				fileList = append(fileList, path)
-				return nil
-			})
-			if err != nil {
-				log.Fatalf("walk error [%v]\n", err)
-				return nil, err
-			}
-			return fileList, nil
-		}
 	}
 
-	var err error
 	{ // Copy Dir only
-		if err = mirrorDir("url\\", outputDir, []string{
+		if err := mirrorDir("url\\", outputDir, []string{
 			"url\\pkg",
 			"url\\static\\sass",
 		}); err != nil {
@@ -155,14 +117,19 @@ func build(outputDir string) error {
 	}
 
 	{ // and then copy file
-		filePathList, _ := collectFiles("url\\", config.excludeFiles)
+		tmplFiles, err := filepath2.CollectFiles("url/tmpl", []string{"\\.md$"})
+		if err != nil {
+			return err
+		}
+
+		filePathList, _ := filepath2.CollectFiles("url\\", config.excludeFiles)
 		for _, src := range filePathList {
 			// dst := filepath.Join("../docs/", strings.Replace(src, "url\\", "", 1)) // filepath.Join反斜線會自動修正，所以這樣也可以
 			dst := filepath.Join(outputDir, strings.Replace(src, "url\\", "", 1))
 			// fmt.Println(dst)
 			if filepath.Ext(dst) == ".gohtml" {
 				dst = dst[:len(dst)-6] + "html"
-				if err = render(src, dst); err != nil {
+				if err = render(src, dst, tmplFiles); err != nil {
 					return err
 				}
 				continue
@@ -178,6 +145,12 @@ func build(outputDir string) error {
 
 func BuildServer(isLocalMode bool) (server *http.Server, listener net.Listener) {
 	mux := http.NewServeMux()
+
+	tmplFiles, err := filepath2.CollectFiles("url/tmpl", []string{"\\.md$"})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		rootDir := http.Dir("./url/")
 		curFilepath := filepath.Join(string(rootDir), r.URL.Path)
@@ -192,11 +165,13 @@ func BuildServer(isLocalMode bool) (server *http.Server, listener net.Listener) 
 		case ".gohtml":
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			src := filepath.Join(string(rootDir), r.URL.Path)
-			parseFiles := getParseFiles(src, "url/tmpl")
+			var parseFiles []string
+			parseFiles, err = template.GetAllTmplName(os.ReadFile, src, tmplFiles)
+			parseFiles = append(parseFiles, src)
 
 			t := htmlTemplate.Must(
 				htmlTemplate.New(filepath.Base(src)).
-					Funcs(htmlTemplate.FuncMap(funcs.GetUtilsFuncMap())).
+					Funcs(funcs.GetUtilsFuncMap()).
 					ParseFiles(parseFiles...),
 			)
 
@@ -220,7 +195,6 @@ func BuildServer(isLocalMode bool) (server *http.Server, listener net.Listener) 
 		server = &http.Server{Addr: fmt.Sprintf(":%d", config.Server.Port), Handler: mux}
 	}
 
-	var err error
 	listener, err = net.Listen("tcp", server.Addr)
 	if err != nil {
 		panic(err)

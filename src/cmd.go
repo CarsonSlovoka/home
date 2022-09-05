@@ -137,7 +137,7 @@ func startCMD(wg *sync.WaitGroup) {
 				pOK.Printf("http://%s\n", url)
 			}
 		default:
-			return "", pErr.Errorf("unknown command %q", strings.Join(args, " "))
+			return "", fmt.Errorf("unknown command %q", strings.Join(args, " "))
 		}
 		return "", err
 	}
@@ -150,7 +150,7 @@ func startCMD(wg *sync.WaitGroup) {
 		args := strings.Split(input, " ")
 		response, err := handleMsg(args)
 		if err != nil {
-			_, _ = fmt.Fprintln(os.Stderr, err)
+			_, _ = pErr.Fprintln(os.Stderr, err)
 			continue
 		}
 		if response == "quit" {
