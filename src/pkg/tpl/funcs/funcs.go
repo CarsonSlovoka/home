@@ -21,7 +21,7 @@ func init() {
 
 func GetUtilsFuncMap() map[string]any {
 	funcMap := funcs.GetUtilsFuncMap()
-	funcMap["markDown"] = func(srcPath string, ctx any) template.HTML { // 回傳值如果是普通的string，不會轉成HTML會被當成一般文字
+	funcMap["md"] = func(srcPath string, ctx any) template.HTML { // 回傳值如果是普通的string，不會轉成HTML會被當成一般文字
 		rootDir := "url"
 		buf := bytes.NewBuffer(make([]byte, 0))
 		srcBytes, err := os.ReadFile(filepath.Join(rootDir, srcPath))
