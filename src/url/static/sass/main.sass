@@ -1,46 +1,11 @@
 // https://kittygiraudel.com/2013/08/08/advanced-sass-list-functions/
 
 @use 'src/root'
-
-@use 'src/animation/animation'
-
-@use 'src/layout/containers'
-@use 'src/layout/grid'
-@use 'src/layout/columns'
-
-@use 'src/components/navbar'
-@use 'src/components/buttons'
-@use 'src/components/dropdown'
-@use 'src/components/modal'
-
-@use 'src/content/typography'
-
-@use 'src/helpers/position'
-
-@use 'src/utilities/spacing'
-@use 'src/utilities/utilities'
-
 @use 'src/id'
 
-@include animation.styles
-
-@include containers.styles
-@include grid.styles
-@include columns.styles
-
-@include navbar.styles
-@include buttons.styles
-@include dropdown.styles
-@include modal.styles
-
-@include typography.styles
-
-@include position.styles
-
-@include spacing.styles
-@include utilities.styles
-@include utilities.colors
-@include utilities.background
-
-@include id.styles
-
+@use 'src/animation'
+@use 'src/layout'
+@use 'src/components'
+@use 'src/content'
+@use 'src/helpers'
+@use 'src/utilities'
