@@ -1,2 +1,4 @@
 github.com/CarsonSlovoka/go-pkg/v2 v2.2.1-0.20220905031907-1190fbd1fd1a h1:ErnQZfemHkGkuA3iwSuqhsDx+s/8pRJLzO/664cGxxU=
 github.com/CarsonSlovoka/go-pkg/v2 v2.2.1-0.20220905031907-1190fbd1fd1a/go.mod h1:Fz9coiU/Exf+VH2kpAq/VduC0g1x1LH3pBj7yRCK7iM=
+github.com/yuin/goldmark v1.4.14 h1:jwww1XQfhJN7Zm+/a1ZA/3WUiEBEroYFNTiV3dKwM8U=
+github.com/yuin/goldmark v1.4.14/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=

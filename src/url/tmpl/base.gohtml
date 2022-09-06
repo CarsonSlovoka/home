@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {{template "head.gohtml" .}}
+    {{block "head" .}}
+    {{end}}
+</head>
+
+{{template "navbar.gohtml" . -}}
+
+<body class="container">
+<div class="mt-6"></div>
+{{block "body" . -}}
+
+{{end -}}
+</body>
+
+{{template "footer.gohtml" . -}}
+</html>

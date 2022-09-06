@@ -2,9 +2,9 @@ package main
 
 import (
 	io2 "carson.io/pkg/io"
+	"carson.io/pkg/tpl/funcs"
 	"fmt"
 	filepath2 "github.com/CarsonSlovoka/go-pkg/v2/path/filepath"
-	"github.com/CarsonSlovoka/go-pkg/v2/tpl/funcs"
 	"github.com/CarsonSlovoka/go-pkg/v2/tpl/template"
 	htmlTemplate "html/template"
 	"log"
@@ -36,8 +36,7 @@ type Server struct {
 }
 
 var (
-	config   *Config
-	chanQuit chan error
+	config *Config
 )
 
 func init() {
@@ -50,14 +49,16 @@ func init() {
 			`url\\static\\img\\.*\.md`,
 			`url\\static\\js\\.*\.md`,
 			`url\\static\\sass\\.*`,
+
 			`url\\tmpl\\.*`, // 樣版在release不需要再給，已經遷入到source之中
+
+			`url\\blog\\.*\.md`, // 不需要source，留下html即可
 		}, &SiteContext{
 			"Carson-Blog",
 			"0.0.0",
 			now.Format("2006-01-02 15:04"),
 		},
 	}
-	chanQuit = make(chan error)
 }
 
 func render(src, dst string, tmplFiles []string) error {
