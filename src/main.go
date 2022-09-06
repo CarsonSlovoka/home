@@ -1,3 +1,5 @@
+// go build -o home.exe -ldflags "-s -w"
+
 package main
 
 import (
@@ -51,6 +53,8 @@ func init() {
 			`url\\static\\sass\\.*`,
 
 			`url\\tmpl\\.*`, // 樣版在release不需要再給，已經遷入到source之中
+
+			`url\\ts\\.*`,
 
 			`url\\blog\\.*\.md`, // 不需要source，留下html即可
 		}, &SiteContext{
