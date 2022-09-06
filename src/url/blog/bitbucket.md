@@ -7,7 +7,7 @@ Bitbucket Cloud recently stopped supporting account passwords for Git authentica
 remote: See our community post for more details: https://atlassian.community/t5/x/x/ba-p/1948231
 remote: App passwords are recommended for most use cases and can be created in your Personal settings:
 remote: https://bitbucket.org/account/settings/app-passwords/
-fatal: Authentication failed for 'https://bitbucket.org/xxx/....git/'
+fatal: Authentication failed for 'https://bitbucket.org/xxx/....git/
 ```
 
 要至

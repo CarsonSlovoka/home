@@ -4,7 +4,8 @@
 
 1. 查找itunes.exe的位置: 打開powershell，輸入
     > gcm itunes.exe
-2. 關閉自動備份:
+
+3. 關閉自動備份:
    這邊的範例假設位於ProgramFiles下，可自行替換成您的iTunes.exe路徑
 
     ```

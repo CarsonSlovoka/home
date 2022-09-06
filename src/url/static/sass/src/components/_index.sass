@@ -2,3 +2,51 @@
 @use "dropdown"
 @use "modal"
 @use "navbar"
+
+/* https://fonts.google.com/specimen/Noto+Sans+TC?subset=chinese-traditional&preview.text=%E4%BB%96%E5%80%91%E3%80%82&preview.text_type=custom */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400&display=swap')
+// Sans Serif // name: Noto Sans TC
+
+html
+  --featured-img: linear-gradient(180deg, #fff, #262626)
+  // background-image: radial-gradient(50% 50% at top center,rgba(0,0,0,.66),#262626),var(--featured-img)
+  background-image: radial-gradient(50% 50%, rgba(0, 0, 0, .66), #262626), var(--featured-img)
+
+  // Google fonts
+  font-family: "Noto Sans TC", sans-serif
+
+code
+  font-family: "Noto Sans TC", sans-serif
+  color: crimson
+
+body
+  background: #eee
+  color: #111
+
+blockquote
+  // 在左側生成一個小方塊，增加辨別度
+  border-left-width: 0.5em
+  border-left-style: solid
+  border-color: var(--note-border, #52e052)
+  background: var(--note-bg, #e9fbe9)
+  padding: 0.5em
+  overflow: auto
+
+// code-block
+pre
+  background-color: #222
+  color: #ddd
+  // width: max-content
+  // max-width: inherit
+  overflow: auto
+
+  // 讓code可以與pre的邊距有些距離不要緊連
+  padding: 1.5em 1.5em
+
+  & code
+    color: #ddd
+    overflow: auto
+
+    & span
+      // 不要改變主題色所套用的顏色, 直接以寫進去的style為準
+      color: initial
