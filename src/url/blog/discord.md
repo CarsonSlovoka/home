@@ -15,12 +15,13 @@
 
 然後您可以找有支援webhooks的服務器，把該網址填入，舉Github為例:
 
-> https://github.com/<username>/<repoName>/settings/hooks
+> https://github.com/{username}/{repoName}/settings/hooks
 >
 > (username和repoName會成自己的)
 >
 >
-> Payload URL: https://discord.com/api/webhooks/<xxxID>/<token>/github   (❗注意: 最後要加上/github)
+> Payload URL: https://discord.com/api/webhooks/{xxxID}/{token}/github   (❗注意: 最後要加上`/github`)
+>
 > content type: application/json
 
 就可以設定webhook，可以指派是所有動作都要發送通知還是只有push的時候才傳送通知等等

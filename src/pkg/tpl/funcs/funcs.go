@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/CarsonSlovoka/go-pkg/v2/tpl/funcs"
 	"github.com/yuin/goldmark"
+	highlighting "github.com/yuin/goldmark-highlighting"
+	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/renderer/html"
 	"html/template"
 	"os"
@@ -14,9 +16,16 @@ import (
 var markdown goldmark.Markdown
 
 func init() {
-	markdown = goldmark.New(goldmark.WithRendererOptions(
-		html.WithUnsafe(),
-	))
+	markdown = goldmark.New(
+		goldmark.WithExtensions(
+			extension.GFM, // 包含 Linkify, Table, Strikethrough, TaskList
+			extension.Footnote,
+			highlighting.Highlighting,
+		),
+		goldmark.WithRendererOptions(
+			html.WithUnsafe(),
+		),
+	)
 }
 
 func GetUtilsFuncMap() map[string]any {
