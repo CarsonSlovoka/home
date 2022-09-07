@@ -29,3 +29,43 @@
   &:hover
     color: #fff
     background-color: #c34e2e
+
+.btn-copy-pre
+  // 設定預設大小，這樣<img src=.svg>會自動有比較合適的大小，不需要再額外寫width
+  width: 2em
+  height: 2.3em
+
+  color: #272822
+  background-color: #FFF
+  border: 0.2em solid #272822
+  // border-color: #272822
+  border-radius: 0.2em 0.2em
+
+  // right-align
+  display: block
+  margin-left: auto
+  margin-right: 0
+
+  // position必須是{absolute, relative, fixed} z-index才會有作用
+  position: relative
+  z-index: 1
+
+  // 讓它往下跑進去到code-block中(使看起來的效果很像鑲嵌進去的感覺)
+  margin-bottom: -2em
+
+  padding: 0.1em 0.3em
+  font-size: 0.8em
+
+  &:hover
+    cursor: pointer
+    background-color: #F2F2F2
+
+  &:focus
+    // Avoid an ugly focus outline on click in Chrome,
+    //   but darken the button for accessibility.
+    //   See https://stackoverflow.com/a/25298082/1481479
+    background-color: #E6E6E6
+    outline: 0
+
+  &:active
+    background-color: #D9D9D9
