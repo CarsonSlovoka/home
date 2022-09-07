@@ -1,4 +1,5 @@
-{{template "base.gohtml" .}}
+{{- $title := "Bitbucket異動紀錄" -}}
+{{template "blog.base.gohtml" dict "Site" . "Title" $title }}
 {{define "body"}}
     {{md "blog/bitbucket.md" .}}
 {{end}}

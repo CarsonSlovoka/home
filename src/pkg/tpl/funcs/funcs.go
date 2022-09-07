@@ -9,6 +9,7 @@ import (
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/renderer/html"
 	"html/template"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -42,6 +43,10 @@ func GetUtilsFuncMap() map[string]any {
 			panic(err)
 		}
 		return template.HTML(buf.String())
+	}
+	funcMap["debug"] = func(a ...any) string {
+		log.Printf("%+v", a)
+		return fmt.Sprintf("%+v", a)
 	}
 	return funcMap
 }

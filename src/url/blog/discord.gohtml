@@ -1,4 +1,5 @@
-{{template "base.gohtml" .}}
+{{- $title := "Discord" -}}
+{{template "blog.base.gohtml" dict "Site" . "Title" $title }}
 {{define "body"}}
     {{md "blog/discord.md" .}}
 {{end}}
