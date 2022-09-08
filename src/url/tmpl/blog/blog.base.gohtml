@@ -3,6 +3,14 @@
 <head>
     {{template "head.gohtml" .}}
   <script src="/static/js/clipboard/copy-pre.js"></script>
+
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"> {{/* 這個css裡面還有包含很多woff，單純抓這個css沒有woff也沒用 */}}
+  <script src="/static/js/pkg/d3.js"></script> {{/* 不需要特別加上版號，min.js裡面已經包含 */}}
+  <script src="/static/js/pkg/markmap-view.js"></script>
+  <script type="module" src="/static/js/uml/toc_markmap.js"></script> {{/* module自帶有defer的效果，所以兩者都有defer時順序還是要確定一下 */}}
+  <script defer src="/static/js/pkg/webfontloader.js"></script> {{/* 注意他要放在最後面(defer)才有效果 */}}
+
     {{block "head" .}}
     {{end}}
 </head>
