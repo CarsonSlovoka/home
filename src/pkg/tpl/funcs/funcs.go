@@ -48,27 +48,33 @@ func GetUtilsFuncMap() map[string]any {
 	}
 	funcMap["debug"] = func(a ...any) string {
 		log.Printf("%+v", a)
-		return fmt.Sprintf("%+v", a)
+		return "" // fmt.Sprintf("%+v", a) // 只把訊息顯示在console，避免放到html之中
 	}
 	funcMap["timeStr"] = func(t time.Time) string {
 		// t.Format("2006-01-02 15:04") // 到分感覺沒有意義
 		return t.Format("2006-01-02")
 	}
 
-	funcMap["setVal"] = func(obj any, key string, val any) (string, error) {
-		// ps := reflect.ValueOf(obj) // pointer to struct - addressable
-		// s := ps.Elem()             // struct
-		s := reflect.ValueOf(obj)
+	funcMap["time"] = func(value string) (time.Time, error) {
+		return time.Parse("2006-01-02", value)
+	}
+
+	funcMap["set"] = func(obj any, key string, val any) (string, error) {
+		ps := reflect.ValueOf(obj)
+		s := ps.Elem()
 		if s.Kind() != reflect.Struct {
-			return "", fmt.Errorf("type error. 'Struct' expected\n")
+			log.Printf("type error. 'Struct' expected\n")
+			return "", nil
 		}
 		field := s.FieldByName(key)
 		if !field.IsValid() {
-			return "", fmt.Errorf("key not found: %s\n", key)
+			log.Printf("key not found: %s\n", key)
+			return "", nil
 		}
 
-		if !field.CanSet() { // 只能對pointer類才能異動數值
-			return "", fmt.Errorf("The field[%s] is unchangeable. You can't change it.\n", key)
+		if !field.CanSet() {
+			log.Printf("The field[%s] is unchangeable. You can't change it.\n", key)
+			return "", nil
 		}
 		field.Set(reflect.ValueOf(val))
 		return "", nil

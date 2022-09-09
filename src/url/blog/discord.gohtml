@@ -1,5 +1,5 @@
-{{- $title := "Discord" -}}
-{{template "blog.base.gohtml" dict "Site" . "Title" $title }}
+{{set . "Title" "Discord"}}
+{{template "blog.base.gohtml" . }}
 {{define "body"}}
     {{md "blog/discord.md" .}}
 {{end}}

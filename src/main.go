@@ -5,6 +5,7 @@ package main
 import (
 	io2 "carson.io/pkg/io"
 	"carson.io/pkg/tpl/funcs"
+	"encoding/json"
 	"fmt"
 	filepath2 "github.com/CarsonSlovoka/go-pkg/v2/path/filepath"
 	"github.com/CarsonSlovoka/go-pkg/v2/tpl/template"
@@ -27,6 +28,14 @@ type Config struct {
 	SiteContext  // 不使用指標，我們希望用此變數傳入Execute時，它的ctx彼此都是獨立，不會因為有些頁面改變而受到影響
 }
 
+type Server struct {
+	Port int
+}
+
+var (
+	config *Config
+)
+
 type SiteContext struct {
 	Title            string    // 頁面的title
 	Version          string    // 可以考慮是否移除，目前用處可能不大，或者放到about?
@@ -35,13 +44,14 @@ type SiteContext struct {
 	EnableMarkMapToc bool      // 預設啟用
 }
 
-type Server struct {
-	Port int
+func (s *SiteContext) String() string {
+	v, err := json.MarshalIndent(s, "", "  ")
+	if err != nil {
+		pErr.Printf("[SiteContext] json marshal error. %s", err)
+		return ""
+	}
+	return string(v)
 }
-
-var (
-	config *Config
-)
 
 func init() {
 	now := time.Now()
@@ -85,7 +95,8 @@ func render(src, dst string, tmplFiles []string) error {
 			Funcs(funcs.GetUtilsFuncMap()).
 			ParseFiles(parseFiles...),
 	)
-	return t.Execute(dstFile, config.SiteContext) // ctx不傳指標，為了讓每個頁面的ctx都獨立，不被彼此影響
+	ctx := config.SiteContext       // copy數值過去，避免原本的SiteContext被異動，注意之所以能這樣用是因為我們的SiteContext目前都沒有存在任何指標類的成員，如果有指標類的成員，這些數值會變成共用，就會不安全要避免
+	return t.Execute(dstFile, &ctx) // 傳指標過去，因為我們希望能更自由的去修改其數值
 }
 
 func build(outputDir string) error {
@@ -228,7 +239,8 @@ func BuildServer(isLocalMode bool) (server *http.Server, listener net.Listener) 
 					ParseFiles(parseFiles...),
 			)
 
-			if err := t.Execute(w, config.SiteContext); err != nil {
+			ctx := config.SiteContext // 複製，使其能夠被修改而不影響原本的物件(注意如果物件本身有其他指標類的結構，此種複製方法是不安全的，該類的數值修改會影響到本體)
+			if err := t.Execute(w, &ctx); err != nil {
 				log.Printf("%s\n", err.Error())
 			}
 		/* 交給http.FileServer(http.Dir()).ServeHTTP(w, r)已經會自行處理MIME_types
