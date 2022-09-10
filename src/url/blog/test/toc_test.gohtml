@@ -1,0 +1,20 @@
+{{template "blog.base.gohtml" . }}
+{{define "head" }}
+    <style>
+      .toc {
+        overflow: auto;
+        height: 600px;
+        position: fixed;
+        right: 20vw;
+        top: 20vh;
+        background: white;
+      }
+    </style>
+{{end}}
+{{define "body"}}
+    {{md "blog/test/toc_test.md" .}}
+
+    <div class="toc">
+        {{safeHTML .TableOfContents}}
+    </div>
+{{end}}

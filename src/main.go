@@ -5,7 +5,6 @@ package main
 import (
 	io2 "carson.io/pkg/io"
 	"carson.io/pkg/tpl/funcs"
-	"encoding/json"
 	"fmt"
 	filepath2 "github.com/CarsonSlovoka/go-pkg/v2/path/filepath"
 	"github.com/CarsonSlovoka/go-pkg/v2/tpl/template"
@@ -24,8 +23,8 @@ import (
 
 type Config struct {
 	*Server
-	excludeFiles []string
-	SiteContext  // 不使用指標，我們希望用此變數傳入Execute時，它的ctx彼此都是獨立，不會因為有些頁面改變而受到影響
+	excludeFiles      []string
+	funcs.SiteContext // 不使用指標，我們希望用此變數傳入Execute時，它的ctx彼此都是獨立，不會因為有些頁面改變而受到影響
 }
 
 type Server struct {
@@ -35,23 +34,6 @@ type Server struct {
 var (
 	config *Config
 )
-
-type SiteContext struct {
-	Title            string    // 頁面的title
-	Version          string    // 可以考慮是否移除，目前用處可能不大，或者放到about?
-	LastBuildTime    time.Time // 表示此頁面被建立的日期
-	LastModTime      time.Time // 頁面的修改日期，建議在各別頁面在自己設定
-	EnableMarkMapToc bool      // 預設啟用
-}
-
-func (s *SiteContext) String() string {
-	v, err := json.MarshalIndent(s, "", "  ")
-	if err != nil {
-		pErr.Printf("[SiteContext] json marshal error. %s", err)
-		return ""
-	}
-	return string(v)
-}
 
 func init() {
 	now := time.Now()
@@ -68,8 +50,9 @@ func init() {
 
 			`url\\ts\\.*`,
 
-			`url\\blog\\.*\.md`, // 不需要source，留下html即可
-		}, SiteContext{ // 設定預設值，注意，這裡的ctx是獨立的，各個頁面可以針對該ctx進行修改，都不會影響到彼此
+			`url\\blog\\.*\.md`,   // 不需要source，留下html即可
+			`url\\blog\\test\\.*`, // 測試用的檔案都不複製
+		}, funcs.SiteContext{ // 設定預設值，注意，這裡的ctx是獨立的，各個頁面可以針對該ctx進行修改，都不會影響到彼此
 			Title:            "Carson-Blog",
 			Version:          "0.0.0",
 			LastBuildTime:    now, // .Format("2006-01-02 15:04")

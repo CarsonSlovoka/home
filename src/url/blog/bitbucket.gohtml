@@ -2,7 +2,7 @@
 {{set . "Title" $title}}
 {{set . "LastModTime" (time "2022-09-09")}}
 {{$ctx := .}}
-{{debug $ctx}}
+{{/* debug $ctx */}}
 {{template "blog.base.gohtml" $ctx }}
 {{define "body"}}
     {{md "blog/bitbucket.md" .}} {{/* 外層的變數ctx沒辦法傳到define內部，此.為該template所傳入的. */}}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	. "carson.io/pkg/utils"
 	"context"
 	"flag"
 	"fmt"
@@ -40,7 +41,7 @@ func initFlagRun(p *ParaRun) *flag.FlagSet {
 
 func shutdownServer(server *http.Server) error {
 	if server == nil {
-		pInfo.Println("The server has shutdown already.")
+		PInfo.Println("The server has shutdown already.")
 		return nil
 	}
 	return server.Shutdown(context.Background())
@@ -75,17 +76,17 @@ func startCMD(wg *sync.WaitGroup) {
 			{
 				if err = flagSetBuild.Parse(args[1:]); err != nil {
 					// 會自動觸發預設的錯誤
-					return "", pErr.Errorf("parse build error")
+					return "", PErr.Errorf("parse build error")
 				}
 				p := paraBuild
 				if p.isForce {
 					if _, err := os.Stat(p.outputDir); !os.IsNotExist(err) {
-						return "", pErr.Errorf("the directory (%s) exists already", p.outputDir)
+						return "", PErr.Errorf("the directory (%s) exists already", p.outputDir)
 					}
 				}
-				pOK.Println("Start build...")
+				POk.Println("Start build...")
 				err = build(p.outputDir)
-				pOK.Println("End build")
+				POk.Println("End build")
 			}
 
 		case "cls":
@@ -99,7 +100,7 @@ func startCMD(wg *sync.WaitGroup) {
 					cmd = exec.Command("cmd", "/c", "cls") // /c: Close
 					cmd.Stdout = os.Stdout
 				default:
-					return "", pErr.Errorf("your platform is unsupported! i can't clear terminal screen :(")
+					return "", PErr.Errorf("your platform is unsupported! i can't clear terminal screen :(")
 				}
 				return "", cmd.Run()
 			}
@@ -108,11 +109,11 @@ func startCMD(wg *sync.WaitGroup) {
 		case "run":
 			{
 				if server != nil {
-					return "", pErr.Errorf("run already.")
+					return "", PErr.Errorf("run already.")
 				}
 
 				if err = flagSetRun.Parse(args[1:]); err != nil {
-					return "", pErr.Errorf("parse run error")
+					return "", PErr.Errorf("parse run error")
 				}
 				p := paraRun
 				server, listener = BuildServer(p.isLocalMode)
@@ -120,7 +121,7 @@ func startCMD(wg *sync.WaitGroup) {
 				go func() {
 					if err2 := server.Serve(listener); err2 != nil {
 						server = nil // 表示關閉，重新指派到nil去，方便再啟動
-						log.Println(pOK.Sprintf("close the server.\n"))
+						log.Println(POk.Sprintf("close the server.\n"))
 					}
 				}()
 
@@ -134,7 +135,7 @@ func startCMD(wg *sync.WaitGroup) {
 						panic(err)
 					}
 				}
-				pOK.Printf("http://%s\n", url)
+				POk.Printf("http://%s\n", url)
 			}
 		default:
 			return "", fmt.Errorf("unknown command %q", strings.Join(args, " "))
@@ -150,7 +151,7 @@ func startCMD(wg *sync.WaitGroup) {
 		args := strings.Split(input, " ")
 		response, err := handleMsg(args)
 		if err != nil {
-			_, _ = pErr.Fprintln(os.Stderr, err)
+			_, _ = PErr.Fprintln(os.Stderr, err)
 			continue
 		}
 		if response == "quit" {
