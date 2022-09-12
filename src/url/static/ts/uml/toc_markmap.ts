@@ -100,7 +100,7 @@ const setStyleRule = (sheetName: string, selector: string, rule: string) => {
     }
 }
 
-// 因為code-block的按鈕會與svg的呈現相衝，所以一者出現另一者就隱藏
+// ~~因為code-block的按鈕會與svg的呈現相衝，所以一者出現另一者就隱藏~~ 使用z-index取代
 function hideBtnCopyPre() {
     let copy_btn_list = document.getElementsByClassName("btn-copy-pre") as HTMLCollection
     for (let btn of copy_btn_list as any) {
@@ -125,8 +125,11 @@ function showBtnCopyPre() {
         <svg id="${idName}" class="mindmap" />
         `)
         const svgElem = frag.querySelector(`svg`) as SVGElement
-        svgElem.onmouseover = hideBtnCopyPre // 這是我們自己創建用來copy code block的按鈕，在顯示mindmap的時候，這個按鈕會和mindmap所提供的SVG相衝，所以把它隱藏
-        svgElem.onmouseout = showBtnCopyPre
+
+        // 使用z-index來輔助，不需要倚靠js來隱藏
+        // svgElem.onmouseover = hideBtnCopyPre // 這是我們自己創建用來copy code block的按鈕，在顯示mindmap的時候，這個按鈕會和mindmap所提供的SVG相衝，所以把它隱藏
+        // svgElem.onmouseout = showBtnCopyPre
+
         // navElem.replaceWith(svgElem)
         document.body.append(frag)
 

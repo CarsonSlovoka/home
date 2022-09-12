@@ -36,3 +36,19 @@
 
 .logo
   cursor: pointer
+
+.toc
+  overflow: auto
+  height: 600px
+  position: fixed
+  right: 3vw
+  top: 20vh
+  background: white
+
+  // 讓其圖層盡量高於其他元素，使其維持在頂層
+  z-index: 1
+
+
+// 當pre hover時，代表我們專注於pre區塊，所以讓toc暫時看不見，避免影響觀看
+pre:hover ~ .toc
+  display: none
