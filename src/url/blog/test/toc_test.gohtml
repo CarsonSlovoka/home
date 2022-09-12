@@ -14,7 +14,5 @@
 {{define "body"}}
     {{md "blog/test/toc_test.md" .}}
 
-    <div class="toc">
-        {{safeHTML .TableOfContents}}
-    </div>
+    {{.TableOfContents}}
 {{end}}

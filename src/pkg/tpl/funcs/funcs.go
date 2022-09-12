@@ -41,7 +41,9 @@ type SiteContext struct {
 	LastBuildTime    time.Time // 表示此頁面被建立的日期
 	LastModTime      time.Time // 頁面的修改日期，建議在各別頁面在自己設定
 	EnableMarkMapToc bool      // 預設啟用
-	TableOfContents  string    //
+
+	TableOfContents template.HTML // 以ul的形式，產生出toc的內容
+
 }
 
 func (s *SiteContext) String() string {
@@ -60,17 +62,23 @@ type TOCNode struct {
 	Children []*TOCNode
 }
 
-func renderToc(nodes []*TOCNode) string {
-	result := "<ul>"
+func renderToc(nodes []*TOCNode, ulClassName string) template.HTML {
+	var result string
+	if ulClassName != "" {
+		result = fmt.Sprintf(`<ul class="%s">`, ulClassName)
+	} else {
+		result = "<ul>"
+	}
+
 	for _, node := range nodes {
 		result += "<li>" + node.Content
 		if len(node.Children) > 0 {
-			result += renderToc(node.Children)
+			result += string(renderToc(node.Children, ""))
 		}
 		result += "</li>"
 	}
 	result += "</ul>"
-	return result
+	return template.HTML(result)
 }
 
 func GetUtilsFuncMap() map[string]any {
@@ -140,7 +148,7 @@ func GetUtilsFuncMap() map[string]any {
 		}
 
 		c := ctx.(*SiteContext)
-		c.TableOfContents = renderToc(rootNode)
+		c.TableOfContents = renderToc(rootNode, "toc")
 		return template.HTML(buf.String())
 	}
 	funcMap["debug"] = func(a ...any) string {
