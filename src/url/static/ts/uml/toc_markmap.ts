@@ -1,10 +1,10 @@
-type mindMapData = {
+type markMapData = {
     // 以下的type, payload，都是為了還原資料所用，所以可以省略
     // type: string // heading表示hx, node-list表示為項目符號
     // payload: {lines: [number]} // 可以知道是第幾列
     depth: number
     content: string
-    children: mindMapData[] | undefined | null
+    children: markMapData[] | undefined | null
 }
 
 class Toc {
@@ -14,7 +14,7 @@ class Toc {
         this.data = node_nav
     }
 
-    createMindMap(svgID: string, data: mindMapData) {
+    createMarkmap(svgID: string, data: markMapData) {
         (window as any).WebFontConfig = { // 數學符號Katex可以正常顯示用
             custom: {families: ["KaTeX_AMS", "KaTeX_Caligraphic:n4,n7", "KaTeX_Fraktur:n4,n7", "KaTeX_Main:n4,n7,i4,i7", "KaTeX_Math:i4,i7", "KaTeX_Script", "KaTeX_SansSerif:n4,n7,i4", "KaTeX_Size1", "KaTeX_Size2", "KaTeX_Size3", "KaTeX_Size4", "KaTeX_Typewriter"]},
             active: () => {
@@ -31,7 +31,7 @@ class Toc {
     }
 
     // 讀取ul的資料把它轉換成mainMapData
-    private getElement(ulElem: HTMLUListElement, c: mindMapData[], curLevel: number) {
+    private getElement(ulElem: HTMLUListElement, c: markMapData[], curLevel: number) {
         let li_list = Array.prototype.slice.call(ulElem.childNodes).filter(node => node.nodeName === 'LI')
         li_list.forEach(li => {
             const inner_a = li.firstElementChild;
@@ -51,7 +51,7 @@ class Toc {
             let ul = Array.prototype.slice.call(li.childNodes).filter(node => node.nodeName === 'UL')
 
             if (ul.length > 0) {
-                let subList: mindMapData[] = [];
+                let subList: markMapData[] = [];
                 this.getElement(ul[0], subList, curLevel + 1)
                 c.push({depth: curLevel, content: value, children: subList})
             } else {
@@ -60,10 +60,10 @@ class Toc {
         });
     }
 
-    convert2dict(): mindMapData {
+    convert2dict(): markMapData {
         let root_ul = Array.prototype.slice.call(this.data.childNodes).filter(node => node instanceof HTMLUListElement)[0]
-        const children: mindMapData[] = []
-        const result: mindMapData = {depth: 0, content: "", children}
+        const children: markMapData[] = []
+        const result: markMapData = {depth: 0, content: "", children}
         const level = 1
         this.getElement(root_ul, children, level)
         return result
@@ -86,9 +86,9 @@ const initSVGHoverAttr = (svg: SVGElement) => {
     */
     //document.styleSheets
     const sheetName = "styles"  // .css
-    setStyleRule(sheetName, "#mindmap-toc:hover", "left:" + left + "px") // 直接對此css做異動
-    setStyleRule(sheetName, "#mindmap-toc:hover", "top:" + top + "px")
-    // setStyleRule(sheetName, "#mindmap-toc:hover", "background-color: rgb(255, 0, 0)")
+    setStyleRule(sheetName, "#markmap-toc:hover", "left:" + left + "px") // 直接對此css做異動
+    setStyleRule(sheetName, "#markmap-toc:hover", "top:" + top + "px")
+    // setStyleRule(sheetName, "#markmap-toc:hover", "background-color: rgb(255, 0, 0)")
 }
 
 const setStyleRule = (sheetName: string, selector: string, rule: string) => {
@@ -120,21 +120,21 @@ function showBtnCopyPre() {
         let navElem = document.getElementById('TableOfContents') as HTMLElement
         const toc = new Toc(navElem)
         // const dictData = toc.convert2dict();
-        const idName = 'mindmap-toc'
+        const idName = 'markmap-toc'
         const frag = document.createRange().createContextualFragment(`
-        <svg id="${idName}" class="mindmap" />
+        <svg id="${idName}" class="markmap" />
         `)
         const svgElem = frag.querySelector(`svg`) as SVGElement
 
         // 使用z-index來輔助，不需要倚靠js來隱藏
-        // svgElem.onmouseover = hideBtnCopyPre // 這是我們自己創建用來copy code block的按鈕，在顯示mindmap的時候，這個按鈕會和mindmap所提供的SVG相衝，所以把它隱藏
+        // svgElem.onmouseover = hideBtnCopyPre // 這是我們自己創建用來copy code block的按鈕，在顯示markmap的時候，這個按鈕會和markmap所提供的SVG相衝，所以把它隱藏
         // svgElem.onmouseout = showBtnCopyPre
 
         // navElem.replaceWith(svgElem)
         document.body.append(frag)
 
         // 測試資料
-        const dictData: mindMapData = {
+        const dictData: markMapData = {
             // "type": "heading", // 也不重要，可能是回原完本時會用到，表示這個# hx
             "depth": 0,
             // "payload":{"lines":[1,2]}, // 推測它可以透過這個在還原成原本的文本，但在svg中，這個可以忽略
@@ -216,7 +216,7 @@ function showBtnCopyPre() {
                         }]
                 }]
         }
-        toc.createMindMap(idName, dictData)
+        toc.createMarkmap(idName, dictData)
         initSVGHoverAttr(svgElem)  // 要放在最後面，因為計算hover的寬度會需要用到svg的位置資訊
     }
 )();
