@@ -9,6 +9,7 @@ import (
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting"
 	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
 	"html/template"
 	"log"
@@ -28,6 +29,12 @@ func init() {
 			extension.GFM, // 包含 Linkify, Table, Strikethrough, TaskList
 			extension.Footnote,
 			highlighting.Highlighting,
+		),
+		goldmark.WithParserOptions(
+			parser.WithAutoHeadingID(), // 會自動加上id，但如果有中文heading會不支持
+
+			// https://github.com/yuin/goldmark#attributes
+			parser.WithAttribute(), // 推薦補上這個，可以在heading旁邊利用## MyH1{class="cls1 cls2"}來補上一些屬性 // https://www.markdownguide.org/extended-syntax/#heading-ids // https://github.com/gohugoio/hugo/issues/7548
 		),
 		goldmark.WithRendererOptions(
 			html.WithUnsafe(),
@@ -103,11 +110,11 @@ func GetUtilsFuncMap() map[string]any {
 		// 建立toc物件
 		var rootNode []*TOCNode
 		{
-			reToc := regexp.MustCompile(`(?m)^<h(\d)>(.*)<\/h\d>`)
+			reToc := regexp.MustCompile(`(?m)^<h(\d)(.*)>(.*)<\/h\d>`)
 			matchList := reToc.FindAllStringSubmatch(content, -1)
 			var preNode *TOCNode
 			for _, match := range matchList {
-				depthStr, heading := match[1], match[2] // match[0]是所有匹配的項目，0之後才是每一個group的內容
+				depthStr, _, heading := match[1], match[2], match[3] // match[0]是所有匹配的項目，0之後才是每一個group的內容
 				depth, err := strconv.Atoi(depthStr)
 				if err != nil {
 					PErr.Printf("error strconv.Atoi %s\n", err)

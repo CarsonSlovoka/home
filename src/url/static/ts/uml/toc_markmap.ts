@@ -8,9 +8,9 @@ type markMapData = {
 }
 
 class Toc {
-    private data: Element
+    private data: HTMLUListElement
 
-    constructor(node_nav: Element) {
+    constructor(node_nav: HTMLUListElement) {
         this.data = node_nav
     }
 
@@ -32,9 +32,9 @@ class Toc {
 
     // 讀取ul的資料把它轉換成mainMapData
     private getElement(ulElem: HTMLUListElement, c: markMapData[], curLevel: number) {
-        let li_list = Array.prototype.slice.call(ulElem.childNodes).filter(node => node.nodeName === 'LI')
-        li_list.forEach(li => {
+        ([...ulElem.querySelectorAll("li")] as [HTMLLIElement]).forEach(li => {
             const inner_a = li.firstElementChild;
+            /*
             const value = (() => {
                 // If it contains two links (one is an internal link and the other is an external link, then the internal link is used as the primary link)
                 const inner_a_copy = inner_a.cloneNode(true);  // avoid modify the original innerText  // 如果是false不會把innerText包含進去
@@ -47,7 +47,8 @@ class Toc {
                 }
                 return inner_a_copy.outerHTML;
             })();
-
+             */
+            const value = ""
             let ul = Array.prototype.slice.call(li.childNodes).filter(node => node.nodeName === 'UL')
 
             if (ul.length > 0) {
@@ -117,7 +118,7 @@ function showBtnCopyPre() {
 
 (
     () => {
-        let navElem = document.getElementById('TableOfContents') as HTMLElement
+        let navElem = document.querySelector('ul[class~=toc]') as HTMLUListElement
         const toc = new Toc(navElem)
         // const dictData = toc.convert2dict();
         const idName = 'markmap-toc'
@@ -216,6 +217,7 @@ function showBtnCopyPre() {
                         }]
                 }]
         }
+
         toc.createMarkmap(idName, dictData)
         initSVGHoverAttr(svgElem)  // 要放在最後面，因為計算hover的寬度會需要用到svg的位置資訊
     }
