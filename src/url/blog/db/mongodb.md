@@ -68,6 +68,12 @@ Package: zip
 
 測試: 打開cmd，執行mongosh.exe
 
+```yaml
+mongosh.exe # 使用預設的連線方式
+mongosh.exe mongodb://127.0.0.1:12345 # 可以指定要連到哪裡
+mongosh.exe mongodb://username:password@123.123.123.123:27017/myDBName # 身分驗證
+```
+
 ### mongodb-Compass安裝
 
 有兩種安裝方法:
