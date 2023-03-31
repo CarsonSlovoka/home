@@ -154,8 +154,8 @@ func GetUtilsFuncMap() map[string]any {
 			}
 		}
 
-		c := ctx.(*SiteContext)
-		c.TableOfContents = renderToc(rootNode, "toc")
+		c := ctx.(*SiteContext)                        // 將any斷言成某物件
+		c.TableOfContents = renderToc(rootNode, "toc") // 此時的c表示ctx，更新ctx的內容
 		return template.HTML(buf.String())
 	}
 	funcMap["debug"] = func(a ...any) string {
