@@ -1,7 +1,7 @@
 .navbar
   width: 100%
   margin: auto
-  padding: 0rem 5rem
+  padding: 0 5rem
   display: flex
   justify-content: flex-start
   align-items: center
@@ -34,21 +34,16 @@
     & img
       max-width: 2.5rem
 
+// 固定在畫面右邊，不需要透過javascript來算top來調整
+.navbar-right
+  position: fixed
+  right: 1%
+  width: 20%
+  top: 20%
+  line-height: 24px
+  background-color: hsla(240, 100%, 90%, 0)
+
 .logo
   cursor: pointer
 
-.toc
-  overflow: auto
-  height: 600px
-  position: fixed
-  right: 3vw
-  top: 20vh
-  background: white
 
-  // 讓其圖層盡量高於其他元素，使其維持在頂層
-  z-index: 1
-
-
-// 當pre hover時，代表我們專注於pre區塊，所以讓toc暫時看不見，避免影響觀看
-pre:hover ~ .toc
-  display: none

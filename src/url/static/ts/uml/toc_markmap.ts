@@ -1,3 +1,5 @@
+// https://stackoverflow.com/a/69260236/9935654
+
 type markMapData = {
     // 以下的type, payload，都是為了還原資料所用，所以可以省略
     // type: string // heading表示hx, node-list表示為項目符號
@@ -7,67 +9,93 @@ type markMapData = {
     children: markMapData[] | undefined | null
 }
 
-class Toc {
-    private data: HTMLUListElement
-
-    constructor(node_nav: HTMLUListElement) {
-        this.data = node_nav
+class TocItem {
+    public id: string | undefined
+    public children: TocItem[] | undefined
+    public parent: TocItem | undefined
+    constructor(public content: any, public depth: number, parent = undefined) {
+        this.id = undefined
+        this.parent = parent
+        this.children = []
     }
+}
 
-    createMarkmap(svgID: string, data: markMapData) {
+// 爬取自定義的{h1,..., hn}系列轉換成TocItem[]
+function parseHeading(headingSet: HTMLHeadingElement[]|Element[]): TocItem[] {
+    const tocData = [] as TocItem[]
+    let curLevel = 0
+    let preTocItem: TocItem|undefined = undefined
+
+    headingSet.forEach(heading => {
+        const hLevel = Number(heading.outerHTML.match(/<h([\d]).*>/)![1])
+        const titleText = heading.textContent
+        if (heading.id === "") {
+            heading.id = titleText!.replace(/ /g, "-").toLowerCase()
+        }
+        const titleHTML = `<a href="#${heading.id}">${titleText}</a>` // 我們用的是markmap，它的內容可以直接放<a>
+
+        switch (hLevel >= curLevel) {
+            case true:
+                if (preTocItem === undefined) {
+                    preTocItem = new TocItem(titleHTML, hLevel)
+                    tocData.push(preTocItem)
+                } else {
+                    const curTocItem = new TocItem(titleHTML, hLevel)
+                    const parent = curTocItem.depth > preTocItem.depth ? preTocItem : preTocItem.parent
+                    curTocItem.parent = parent
+                    if (parent !== undefined) { // 如果沒有h1，然後從h2開始就有可能會發生
+                        parent.children!.push(curTocItem)
+                    }
+                    preTocItem = curTocItem
+                }
+                break
+            case false:
+                // 從preTocItem中找到適合的父項
+                // We need to find the appropriate parent node from the preTocItem
+                const curTocItem = new TocItem(titleHTML, hLevel)
+                while (1) {
+                    if (preTocItem!.depth < curTocItem.depth) {
+                        // 父項已被找到
+                        preTocItem!.children!.push(curTocItem)
+                        curTocItem.parent = preTocItem
+                        preTocItem = curTocItem
+                        break
+                    }
+
+                    // 表示前項不為本項目的父項，所以再找"前項.父項"
+                    preTocItem = preTocItem!.parent
+
+                    if (preTocItem === undefined) {
+                        // 如果到最後這個父項還是找不到，就直接將此節點添加
+                        tocData.push(curTocItem)
+                        preTocItem = curTocItem
+                        break
+                    }
+                }
+                break
+        }
+        preTocItem!.id = heading.id
+        curLevel = hLevel
+    })
+
+    return tocData
+}
+
+class Toc {
+    static createMarkmap(svgID: string, data: markMapData) {
         (window as any).WebFontConfig = { // 數學符號Katex可以正常顯示用
             custom: {families: ["KaTeX_AMS", "KaTeX_Caligraphic:n4,n7", "KaTeX_Fraktur:n4,n7", "KaTeX_Main:n4,n7,i4,i7", "KaTeX_Math:i4,i7", "KaTeX_Script", "KaTeX_SansSerif:n4,n7,i4", "KaTeX_Size1", "KaTeX_Size2", "KaTeX_Size3", "KaTeX_Size4", "KaTeX_Typewriter"]},
             active: () => {
-                window.markmap.refreshHook.call()
+                (window as any).markmap.refreshHook.call()
             }
         };
-        (window as any).mm = window.markmap.Markmap.create(
+        (window as any).mm = (window as any).markmap.Markmap.create(
             "svg#" + svgID,
-            window.markmap.deriveOptions(
+            (window as any).markmap.deriveOptions(
                 {"colorFreezeLevel": 4}, // 分支條的顏色數量，用太多會太花
             ),
             data
         )
-    }
-
-    // 讀取ul的資料把它轉換成mainMapData
-    private getElement(ulElem: HTMLUListElement, c: markMapData[], curLevel: number) {
-        ([...ulElem.querySelectorAll("li")] as [HTMLLIElement]).forEach(li => {
-            const inner_a = li.firstElementChild;
-            /*
-            const value = (() => {
-                // If it contains two links (one is an internal link and the other is an external link, then the internal link is used as the primary link)
-                const inner_a_copy = inner_a.cloneNode(true);  // avoid modify the original innerText  // 如果是false不會把innerText包含進去
-                const outer_a = ((RegExp('<a[^>]*>[^<]*<\/a><a[^>]*>[^<]*<\/a>').exec(li.innerHTML)) != null ?
-                        Array.prototype.slice.call(li.childNodes).filter(node => node.nodeName === 'A')[1] :
-                        undefined
-                );
-                if (outer_a !== undefined) {
-                    inner_a_copy.innerText = outer_a.innerText
-                }
-                return inner_a_copy.outerHTML;
-            })();
-             */
-            const value = ""
-            let ul = Array.prototype.slice.call(li.childNodes).filter(node => node.nodeName === 'UL')
-
-            if (ul.length > 0) {
-                let subList: markMapData[] = [];
-                this.getElement(ul[0], subList, curLevel + 1)
-                c.push({depth: curLevel, content: value, children: subList})
-            } else {
-                c.push({depth: curLevel, content: value, children: null})
-            }
-        });
-    }
-
-    convert2dict(): markMapData {
-        let root_ul = Array.prototype.slice.call(this.data.childNodes).filter(node => node instanceof HTMLUListElement)[0]
-        const children: markMapData[] = []
-        const result: markMapData = {depth: 0, content: "", children}
-        const level = 1
-        this.getElement(root_ul, children, level)
-        return result
     }
 }
 
@@ -75,11 +103,11 @@ class Toc {
 const initSVGHoverAttr = (svg: SVGElement) => {
     const clientRectBody = document.body.getBoundingClientRect()
     const clientRectSVG = svg.getBoundingClientRect();
-    const clientHeight = document.documentElement.clientHeight
+    // const clientHeight = document.documentElement.clientHeight
     const new_x = (clientRectBody.width - clientRectSVG.width) / 2  // 計算出兩邊應該留白多少
-    const new_y = (clientHeight - clientRectSVG.height) / 2
-    const left = -(clientRectSVG.x - new_x)  // 從目前的位置移置到應留白的起始位置 (因為我們已知道svg是在右邊，要往左移動所以用-號)
-    const top = -(clientHeight - new_y)
+    // const new_y = (clientHeight - clientRectSVG.height) / 2
+    const left = -(clientRectSVG.x - new_x) *0.8  // 從目前的位置移置到應留白的起始位置 (因為我們已知道svg是在右邊，要往左移動所以用-號)
+    // const top = -(clientHeight - new_y)
     /*
     svg.style["background-color"] = "rgb(0, 0, 0)"
     svg.style.transform = "scale(5)"
@@ -88,7 +116,7 @@ const initSVGHoverAttr = (svg: SVGElement) => {
     //document.styleSheets
     const sheetName = "styles"  // .css
     setStyleRule(sheetName, "#markmap-toc:hover", "left:" + left + "px") // 直接對此css做異動
-    setStyleRule(sheetName, "#markmap-toc:hover", "top:" + top + "px")
+    // setStyleRule(sheetName, "#markmap-toc:hover", "top:" + top + "px")
     // setStyleRule(sheetName, "#markmap-toc:hover", "background-color: rgb(255, 0, 0)")
 }
 
@@ -118,24 +146,9 @@ function showBtnCopyPre() {
 
 (
     () => {
-        let navElem = document.querySelector('ul[class~=toc]') as HTMLUListElement
-        const toc = new Toc(navElem)
-        // const dictData = toc.convert2dict();
-        const idName = 'markmap-toc'
-        const frag = document.createRange().createContextualFragment(`
-        <svg id="${idName}" class="markmap" />
-        `)
-        const svgElem = frag.querySelector(`svg`) as SVGElement
-
-        // 使用z-index來輔助，不需要倚靠js來隱藏
-        // svgElem.onmouseover = hideBtnCopyPre // 這是我們自己創建用來copy code block的按鈕，在顯示markmap的時候，這個按鈕會和markmap所提供的SVG相衝，所以把它隱藏
-        // svgElem.onmouseout = showBtnCopyPre
-
-        // navElem.replaceWith(svgElem)
-        document.body.append(frag)
-
         // 測試資料
-        const dictData: markMapData = {
+        /*
+        const dictDataOld: markMapData = {
             // "type": "heading", // 也不重要，可能是回原完本時會用到，表示這個# hx
             "depth": 0,
             // "payload":{"lines":[1,2]}, // 推測它可以透過這個在還原成原本的文本，但在svg中，這個可以忽略
@@ -217,8 +230,40 @@ function showBtnCopyPre() {
                         }]
                 }]
         }
+         */
+        window.addEventListener('DOMContentLoaded', () => {
+            const headingSet = [...document.querySelectorAll("h1, h2, h3, h4, h5, h6")]
+            const tocItems = parseHeading(headingSet)
+            if (tocItems.length === 0) {
+                return
+            }
 
-        toc.createMarkmap(idName, dictData)
-        initSVGHoverAttr(svgElem)  // 要放在最後面，因為計算hover的寬度會需要用到svg的位置資訊
+            const idName = 'markmap-toc'
+            const frag = document.createRange().createContextualFragment(`
+        <div class="markmapWrapper navbar-right">
+        <svg id="${idName}" class="markmap" />
+        </div>
+        `)
+            const svgElem = frag.querySelector(`svg`) as SVGElement
+
+            // 使用z-index來輔助，不需要倚靠js來隱藏
+            // svgElem.onmouseover = hideBtnCopyPre // 這是我們自己創建用來copy code block的按鈕，在顯示markmap的時候，這個按鈕會和markmap所提供的SVG相衝，所以把它隱藏
+            // svgElem.onmouseout = showBtnCopyPre
+
+            // navElem.replaceWith(svgElem)
+            const tocContainer = frag.querySelector('div')
+            document.body.append(frag)
+
+            const dictData: markMapData = tocItems[0] as markMapData // 理論上都是h1, h2, ... 不支持h2, h2, ...的這種模式，也就是第一個一定是採用h1
+            Toc.createMarkmap(idName, dictData)
+            initSVGHoverAttr(svgElem)  // 要放在最後面，因為計算hover的寬度會需要用到svg的位置資訊
+
+            /* 不需要用js調整，直接用js把top設定成20%就行了
+            window.addEventListener('scroll', () => {
+                const scrollTop = document.documentElement.scrollTop || document.body.scrollTop
+                tocContainer!.style.top = `${Math.max(120, scrollTop + 20)}px` // 預設為120
+            })
+             */
+        })
     }
-)();
+)()

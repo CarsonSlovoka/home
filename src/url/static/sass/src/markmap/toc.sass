@@ -6,9 +6,25 @@
   display: block
   margin: auto
   transform: scale(5)
-  z-index: 1000 // 置頂, 覆蓋所有其他圖層
+
+  // 置頂, 覆蓋所有其他圖層
+  z-index: 1000
 
 
-#markmap-toc:hover ~ #toc
+// #markmap-toc:hover ~ .markmapWrapper
   // hide the toc when #markmap is hovering.
+  // display: none!important
+
+// 當pre hover時，代表我們專注於pre區塊，所以讓toc暫時看不見，避免影響觀看
+pre:hover ~ .markmapWrapper
   display: none
+
+
+// 平常的時候，透明度高，使人比較不會注意到，維持乾淨的觀看版面
+.markmapWrapper
+  background-color: antiquewhite
+  opacity: 0.1
+
+  &:hover
+    background-color: transparent
+    opacity: 1
