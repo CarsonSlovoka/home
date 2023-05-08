@@ -1,0 +1,23 @@
+// 定義一個webkit-animation元件
+@keyframes highlight-target
+  from
+    background: inherit
+  50%
+    border: 2px solid #D4D4D4
+    background-color: #fff700
+  to
+    background: inherit
+    border: inherit
+
+*:target
+  -webkit-animation: highlight-target 2.0s linear
+
+  // Add a pseudo-element inside the target element
+  &::before
+    font: 70% sans-serif
+    content: "►"
+    color: limegreen
+    margin-right: 0.25em
+
+p:target i
+  color: red
