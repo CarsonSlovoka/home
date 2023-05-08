@@ -1,0 +1,12 @@
+{{- $title := "powershell" -}}
+{{set . "Title" $title}}
+{{set . "LastModTime" (time "2023-05-05")}}
+{{$ctx := .}}
+{{template "blog.base.gohtml" $ctx }}
+{{define "body"}}
+    {{md "blog/shell/powershell/powershell.md" .}} {{/* 外層的變數ctx沒辦法傳到define內部，此.為該template所傳入的. */}}
+
+    {{- /*
+    {{.TableOfContents}} 這個還有待修正，結果不是那麼正確，暫時沒用到
+    */ -}}
+{{end}}
