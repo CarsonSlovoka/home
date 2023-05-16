@@ -102,6 +102,25 @@ $env:PSModulePath.Split(";")
 | Get-ChildItem  | gci, **ls**, **dir**                      |
 | Start-Process  | **start**                                 | 開啟目錄或者檔案
 
+### Get-Help
+
+除了查詢指定的命令以外，也可以查看參數的意思，例如:
+
+```
+Get-Help Select-Object -Parameter ExpandProperty
+```
+
+output:
+
+| ExpandProperty | string                               |
+|----------------|--------------------------------------|
+| 必要?            | false                                |
+| 位置?            | 已命名                                |
+| 接受管線輸入?     | false                                |
+| 參數集名稱        | SkipLastParameter, DefaultParameter  |
+| 別名             | 無                                   |
+| 動態?            | false                                |
+
 ## [UWP (Universal Windows Platform)](https://learn.microsoft.com/zh-tw/windows/apps/desktop/modernize/desktop-to-uwp-extend#show-a-modern-xaml-ui)
 
 UWP(通用Windows平台)可以幫忙創建應用程式。
@@ -318,6 +337,16 @@ Get-StartApps | where { $_.Name -match '(dove|go-http|Example)' }
 ```
 
 放完之後在重新檢視AppsFolder就會看到它有在裡面了，此外`Get-StartApps`也會列出來，你就可以看到AppID
+
+> 不過並非所有的項目都一定會在`Start Menu\Programs`中被找到，例如透過命令:
+>
+> > Add-AppxPackage -Path "C:\...\test\AppxManifest.xml" -Register
+>
+> 他的exe檔案位置可以取決於AppxManifest.xml，所以不一定只能放在`Start Menu\Programs`之中。
+>
+> 詳細的位置可以透過Get-AppxPackage找到，例如
+>
+> > (Get-AppxPackage -Name "MyPackage.Identity.Name").InstallLocation
 
 ```yaml
 Name   AppID
