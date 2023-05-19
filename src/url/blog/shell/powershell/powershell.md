@@ -166,9 +166,18 @@ Commandlet: 通常由一個`動詞+名詞`組成，例如`Get-Process`、`New-It
 Cmdlet一般而言有三個條件
 
 1. 函數名稱以動詞開頭，例如:{Get-, Set-, New-}等等: 算是慣例，沒有滿足，也不會怎樣。
-2. 必須要有一個或多個參數:
+
+   > 警告: 有些來自模組 'xxx' 的匯入命令名稱包含未核准的動詞，因此可能不易搜尋。如需核准動詞的清單，請輸入 [Get-Verb](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-verb?view=powershell-7.3)
+   >
+   > 找尋特定的動詞是否有在該列表 `Get-Verb | findstr XXX` 注意XXX有區分大小寫
+   >
+   > 如果你要找是哪一個函數不合法可以加上Verbose，例如 Import-Module xxx -Verbose 如果發現函數名稱不符合指定的動詞就會告訴您
+
+   如果你的名稱不想要遵守指定的動詞規範，那麼函數名稱可以不要是用`-`來串接，例如`Create-Shortcut`改為`CreateShortcut`，這樣也不會跳出警告，但搜尋速度應該還是有些影響，建議盡量遵守規範！
+
+3. 必須要有一個或多個參數:
    因為Cmdlet的設計是在powershell管道中提供小型命令，他們通常需要處理輸入和輸出，而輸入和輸出數據都是透過參數來傳遞，因此如果一個函數沒有參數，它就不能接受輸入或者向外輸出數據，就不符合Cmdlet的設計理念。
-3. 必須要有回傳值
+4. 必須要有回傳值
 
    在powershell中，任何沒有被附值給變量的語句或者表達式的結果，都會自動被視為返回值
 
@@ -666,8 +675,18 @@ $list = @((1..10), (11..20)); $list | foreach { $item = $_; $item | foreach { $_
 @((1..10), (11..20)) | foreach { $_ | foreach { echo $_ } }
 ```
 
+## Powershell5.1的注意事項
+
+### 註解
+如果您是用powershell5.1去開發，有可能會因為註解而影響到，因為他的編碼不是UTF8，您可以在註解的最後面加上「`;`」應該就可以執行了
+
+### SupportsShouldProcess
+
+有一些指令會缺少，例如Start-Process在5.1就沒有Confirm的選項，所以如果要兼容，可能程式碼要做判斷
+
 ## 參考資料
 
+- [discord powershell社群](https://discord.com/channels/180528040881815552/)
 - 黑暗執行緒
     - [Powershell 學習筆記](https://blog.darkthread.net/blog/powershell-learning-notes/)
     - [GET/POST參考](https://blog.darkthread.net/blog/test-webapi-without-tool/): `Invoke-WebRequest`
