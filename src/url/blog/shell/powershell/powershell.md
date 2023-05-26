@@ -68,6 +68,7 @@
     - 取的可用的模組: `Get-Module`
 - 找尋command `get-command -Name *id*`
 - 找尋command開頭須符合 `get-command -Name id*`
+- 創建資料夾: `New-Item "myDir" -ItemType Directory` (已經存在會報錯)
 
 如果想找command的定義，除了查看Definition以外，也可以去找該模塊的路徑，使用Get-Module有可能還是沒辦法查看到完整的路徑
 
@@ -158,6 +159,52 @@ Alpine Linux 3.8+
 其中[Powershell 7.3已確定不在能windows7執行](https://learn.microsoft.com/zh-tw/powershell/scripting/whats-new/what-s-new-in-powershell-73?view=powershell-7.3#breaking-changes-and-improvements)
 
 ## [powershell.editorconfig](https://github.com/PowerShell/PowerShell/blob/7fb867167e9702b292c643f6a4f4cc934acf4811/.editorconfig)
+
+## function
+
+```
+"" 用雙引號包住的字串，如果該字串內容含有變數，會自動將變數轉為其變數的數值
+'' 用單引號包住的內容，不會對內容再進行解析，即當中有變數也會視為是字串
+```
+
+## Unit Test
+
+請使用[Pester](https://github.com/pester/pester)
+
+在powershell5之中，默認已經有裝進去，如果你使用指令
+
+> Get-Command Invoke-Pester
+
+| CommandType | Name          | Version | Source |
+|-------------|---------------|---------|--------|
+| Function    | Invoke-Pester | 3.4.0   | Pester |
+
+他的位置
+```
+start "$env:ProgramFiles\WindowsPowerShell\Modules\Pester\3.4.0"
+```
+
+建議去[更新它](https://pester.dev/docs/introduction/installation#installing-from-psgallery-on-windows-10-or-windows-server-2016)，使用以下指令更新:
+
+```
+Install-Module -Name Pester -Force -SkipPublisherCheck
+```
+
+安裝完之後關閉後重開即可
+
+完成之後會有兩個Pester，一個是3.4另一個為5.4
+
+```
+start "$env:ProgramFiles\WindowsPowerShell\Modules\Pester\3.4.0"
+start "$env:ProgramFiles\WindowsPowerShell\Modules\Pester\5.4.1"
+```
+
+但是如果是透過`SkipPublisherCheck`安裝完之後，你要在`Get-Command Invoke-Pester`看到內容會看不到，要先使用指令
+
+```
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -F
+```
+
 
 ## cmdlet
 
