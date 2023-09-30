@@ -28,8 +28,8 @@ Products -> Community Edtion -> Community Server
 在右方會有下拉選單，選擇您想要下載的版本以及平台
 
 ```yaml
-Version: 6.0.1 # 498MB
-Platform: Windows
+Version: 7.0.2 # 593MB
+Platform: Windows x64
 Package: zip (不需要選msi)
 ```
 
@@ -48,7 +48,7 @@ DBException in initAndListen, terminating","attr":{"error":"NonExistentPath: Dat
 ...
 ```
 
-會告知您找不到該路徑`C:\\data\db`
+會告知您找不到該路徑`C:\\data\db` (此目錄存放您建立的db資料!)
 
 所以要去新增這些資料夾給它
 
@@ -59,8 +59,8 @@ DBException in initAndListen, terminating","attr":{"error":"NonExistentPath: Dat
 > https://www.mongodb.com/try/download/shell
 
 ```yaml
-Version: 1.5.4 # 38.8MB
-Platform: Windows 64-bit (8.1+)
+Version: 2.0.1 # 36.1MB
+Platform: Windows x64(10+)
 Package: zip
 ```
 
@@ -109,14 +109,14 @@ Set-ExecutionPolicy RemoteSigned -Force # 可以改成這個，之後再改回, 
 > https://www.mongodb.com/try/download/compass
 
 ```yaml
-Version: 1.32.6 (Stable)
-Platform: Windows 64-bit(7+)
+Version: 1.40.2 (Stable)
+Platform: Windows 64-bit(10+)
 Package: exe
 ```
 
 完成之後，雙擊這個執行檔就可以執行Compass了
 
-在首次執行時為有一些隱私設定需要設定，建議只勾前兩項
+在首次執行時為有一些隱私設定需要設定，建議只勾前兩項 (以下是1.32.6的版本會問，在1.40.2的版本沒有任何詢問框)
 
 - [x] Enable Automatic Updates
 - [x] Enable Geographic Visualization
@@ -142,11 +142,32 @@ mongodb://127.0.0.1:27017 # 純本機
 ```yaml
 # SETX 可以永久更改
 # /M表示寫在Machine之中 ，有多個路徑可以用;隔開
-SETX /M Mongo "%ProgramFiles%\Mongo;%programFiles%\Mongo\mongodb-win32-x86_64-windows-6.0.1\bin;%ProgramFiles%\Mongo\mongosh-1.5.4-win32-x64\bin;"
+SETX /M Mongo "%ProgramFiles%\Mongo;%programFiles%\Mongo\mongodb-win32-x86_64-windows-7.0.2\bin;%ProgramFiles%\Mongo\mongosh-2.0.1-win32-x64\bin;"
 
   # 放置變數到PATH之後
 SETX /M PATH "%PATH%;%Mongo%"
 # 如果太長會被截段，建議還是手動加)
+```
+
+powershell
+```yaml
+$mongoRoot = Join-Path $env:ProgramFiles Mongo
+$mongodBin =  Join-Path $mongoRoot mongodb-win32-x86_64-windows-7.0.2\bin
+$mongoshBin = Join-Path $mongoRoot mongosh-2.0.1-win32-x64\bin
+$mongoPaths= (
+  $mongoRoot,
+  $mongodBin,
+  $mongoshBin
+)
+# 建議裝User，這樣不需要管理員也能直接用
+# [Environment]::SetEnvironmentVariable("Mongo", $mongoPaths -join ';', [System.EnvironmentVariableTarget]::Machine)
+# [System.Environment]::GetEnvironmentVariable('Mongo').split(';') # 需要重新啟動才會生效
+# [Environment]::SetEnvironmentVariable("Path", "$env:Path;" + '%Mongo%', [System.EnvironmentVariableTarget]::Machine)
+# [Environment]::SetEnvironmentVariable("Mongo", "", [System.EnvironmentVariableTarget]::Machine) # delete
+[Environment]::SetEnvironmentVariable("Mongo", $mongoPaths -join ';', [System.EnvironmentVariableTarget]::User)
+[Environment]::SetEnvironmentVariable("Path", "$env:Path;" + '%Mongo%', [System.EnvironmentVariableTarget]::User)
+$env:Path.Split(';')
+gcm mongod; gcm mongosh;
 ```
 
 ### 教學影片
