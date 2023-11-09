@@ -79,7 +79,7 @@ func startCMD(wg *sync.WaitGroup) {
 					return "", PErr.Errorf("parse build error")
 				}
 				p := paraBuild
-				if p.isForce {
+				if !p.isForce {
 					if _, err := os.Stat(p.outputDir); !os.IsNotExist(err) {
 						return "", PErr.Errorf("the directory (%s) exists already", p.outputDir)
 					}
