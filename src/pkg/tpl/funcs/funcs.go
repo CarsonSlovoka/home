@@ -2,6 +2,7 @@ package funcs
 
 import (
 	"bytes"
+	bytes2 "carson.io/pkg/bytes"
 	. "carson.io/pkg/utils"
 	"encoding/json"
 	"fmt"
@@ -96,11 +97,20 @@ func GetUtilsFuncMap() map[string]any {
 	funcMap["md"] = func(srcPath string, ctx any) template.HTML { // 回傳值如果是普通的string，不會轉成HTML會被當成一般文字
 		rootDir := "url"
 		buf := bytes.NewBuffer(make([]byte, 0))
-		srcBytes, err := os.ReadFile(filepath.Join(rootDir, srcPath))
+		var (
+			srcBytes []byte
+			err      error
+		)
+		srcBytes, err = os.ReadFile(filepath.Join(rootDir, srcPath))
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stdout, "markdown readfile error. srcPath:%s, err: %s\n", srcPath, err)
 			return ""
 		}
+
+		// 目前frontMatter尚無作用
+		// var frontMatter any
+		// frontMatter, srcBytes, err = bytes2.GetFrontMatter(srcBytes)
+		_, srcBytes, err = bytes2.GetFrontMatter(srcBytes, true)
 
 		if err = markdown.Convert(srcBytes, buf); err != nil {
 			panic(err)
