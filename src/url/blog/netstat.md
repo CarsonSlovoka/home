@@ -1,27 +1,28 @@
+---
+{
+  "title": "Bitbucket異動紀錄",
+  "tags": [ "cmd", "netstat" ],
+  "layout": "blog/blog.base.gohtml",
+  "meta": {
+    "description": "..."
+  },
+  "date": "2022-03-03T15:15:00+08:00",
+  "lastMod": "2023-11-17T18:43:00+08:00"
+}
+---
+
 # netstat
 
-> netstat -p tcp
-查看Proto為TCP的類型
+| 指令                                                     | 說明                                           |
+|--------------------------------------------------------|----------------------------------------------|
+| `netstat -p tcp`                                       | 查看Proto為TCP的類型
+| `netstat -o`                                           | 可以顯示PID
+| `netstat -n`                                           | Foreign Address改用`numerical`(數字)顯示
+| `netstat -n INTERVAL`                                  | 多久顯示一次
+| `netstat -b`                                           | 會顯示是哪一個應用程式所用到
+| `netstat -b`                                           | 列出所有訊息列表(包含TCP, UDP, LISTENING, ESTABLISHED)
+| `netstat -ano \| findstr :1234 \| findstr ESTABLISHED` | 找尋埠號為1234且狀態為ESTABLISHED
 
-> netstat -o
-可以顯示PID
-
-> netstat -n
-Foreign Address改用`numerical`(數字)顯示
-
-> netstat -n INTERVAL
-多久顯示一次
-
-> netstat -b
-會顯示是哪一個應用程式所用到
-
-> netstat -b
-列出所有訊息列表(包含TCP, UDP, LISTENING, ESTABLISHED)
-
-----
-
-> netstat -ano | findstr :1234 | findstr ESTABLISHED
-找尋埠號為1234且狀態為ESTABLISHED
 
 ----
 

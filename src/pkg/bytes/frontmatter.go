@@ -3,11 +3,12 @@ package bytes
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"io"
 	"strings"
 )
 
-func GetFrontMatter(src []byte, needRemain bool) (frontMatter []byte, remain []byte, err error) {
+func GetFrontMatter[T any](src []byte, needRemain bool) (frontMatter *T, remain []byte, err error) {
 	reader := bufio.NewReader(bytes.NewReader(src))
 
 	// 有frontMatter的處理
@@ -58,7 +59,9 @@ func GetFrontMatter(src []byte, needRemain bool) (frontMatter []byte, remain []b
 
 		// 表示有找到開始字段---和結尾字段---，即為一個完整的frontMatter
 		if checkCount == 2 {
-			frontMatter = []byte(writer.String())
+			if err = json.Unmarshal([]byte(writer.String()), &frontMatter); err != nil {
+				return nil, nil, err
+			}
 		}
 	}
 

@@ -1,9 +1,7 @@
 package main
 
 import (
-	"carson.io/pkg/bytes"
-	"encoding/json"
-	"fmt"
+	bytes2 "carson.io/pkg/bytes"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -67,33 +65,26 @@ func init() {
 			if filepath.Ext(path) == suffix {
 				var (
 					b      []byte
-					fmBs   []byte
-					frontM FrontMatter
+					frontM *FrontMatter
 				)
 				b, err = os.ReadFile(path)
 				if err != nil {
 					panic(err)
 				}
-				fmBs, _, err = bytes.GetFrontMatter(b, false)
+				frontM, _, err = bytes2.GetFrontMatter[FrontMatter](b, false)
 				if err != nil {
 					panic(err)
 				}
-				if fmBs == nil {
+				if frontM == nil {
 					return nil
 				}
-				if fmBs != nil {
-					if err = json.Unmarshal(fmBs, &frontM); err != nil {
-						panic(err)
-					}
-
-					content := &Content{
-						path,
-						frontM,
-					}
-					db.Contents = append(db.Contents, content)
-					if err != nil {
-						panic(err)
-					}
+				content := &Content{
+					path,
+					*frontM,
+				}
+				db.Contents = append(db.Contents, content)
+				if err != nil {
+					panic(err)
 				}
 			}
 		}
@@ -102,5 +93,4 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(db)
 }

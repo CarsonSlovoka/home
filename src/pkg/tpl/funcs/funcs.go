@@ -4,6 +4,7 @@ import (
 	"bytes"
 	bytes2 "carson.io/pkg/bytes"
 	. "carson.io/pkg/utils"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/CarsonSlovoka/go-pkg/v2/tpl/funcs"
@@ -19,6 +20,7 @@ import (
 	"reflect"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -94,13 +96,18 @@ func GetUtilsFuncMap() map[string]any {
 	funcMap["safeHTML"] = func(val string) template.HTML { // 承諾此數值是安全的，不需要額外的跳脫字元來輔助
 		return template.HTML(val)
 	}
-	funcMap["md"] = func(srcPath string, ctx any) template.HTML { // 回傳值如果是普通的string，不會轉成HTML會被當成一般文字
+	funcMap["md"] = func(srcPath string, ctx struct {
+		SiteContext
+		Filepath string
+		context.Context
+	}) template.HTML { // 回傳值如果是普通的string，不會轉成HTML會被當成一般文字
 		rootDir := "url"
 		buf := bytes.NewBuffer(make([]byte, 0))
 		var (
 			srcBytes []byte
 			err      error
 		)
+
 		srcBytes, err = os.ReadFile(filepath.Join(rootDir, srcPath))
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stdout, "markdown readfile error. srcPath:%s, err: %s\n", srcPath, err)
@@ -110,7 +117,7 @@ func GetUtilsFuncMap() map[string]any {
 		// 目前frontMatter尚無作用
 		// var frontMatter any
 		// frontMatter, srcBytes, err = bytes2.GetFrontMatter(srcBytes)
-		_, srcBytes, err = bytes2.GetFrontMatter(srcBytes, true)
+		_, srcBytes, err = bytes2.GetFrontMatter[any](srcBytes, true)
 
 		if err = markdown.Convert(srcBytes, buf); err != nil {
 			panic(err)
@@ -164,8 +171,9 @@ func GetUtilsFuncMap() map[string]any {
 			}
 		}
 
-		c := ctx.(*SiteContext)                        // 將any斷言成某物件
-		c.TableOfContents = renderToc(rootNode, "toc") // 此時的c表示ctx，更新ctx的內容
+		// c := ctx.(*SiteContext)                        // 將any斷言成某物件
+		// c.TableOfContents = renderToc(rootNode, "toc") // 此時的c表示ctx，更新ctx的內容
+		ctx.SiteContext.TableOfContents = renderToc(rootNode, "toc")
 		return template.HTML(buf.String())
 	}
 	funcMap["debug"] = func(a ...any) string {
@@ -175,6 +183,10 @@ func GetUtilsFuncMap() map[string]any {
 	funcMap["timeStr"] = func(t time.Time) string {
 		// t.Format("2006-01-02 15:04") // 到分感覺沒有意義
 		return t.Format("2006-01-02")
+	}
+
+	funcMap["hasSuffix"] = func(s, suffix string) bool {
+		return strings.HasSuffix(s, suffix)
 	}
 
 	funcMap["time"] = func(value string) (time.Time, error) {

@@ -1,18 +1,3 @@
----
-{
-  "title": "Bitbucket異動紀錄",
-  "tags": [ "git", "hosting" ],
-  "layout": "blog.base.gohtml",
-  "meta": {
-    "description": "..."
-  },
-  "draft": false,
-  "date": "2022-09-09T00:00:00+08:00",
-  "lastMod": "2022-09-09T00:00:00+08:00"
-}
----
-
-
 # Bitbucket
 
 最近<sup>2022/04/02</sup>有了異動，可能會收到以下錯誤

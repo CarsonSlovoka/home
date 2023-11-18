@@ -26,6 +26,11 @@
 {{block "body" . -}}
 
 {{end -}}
+
+{{ if hasSuffix .Filepath ".md" -}}
+    {{/*  {{md "blog/bitbucket.md" .}} */}}
+    {{md .Filepath .}}
+{{end -}}
 </body>
 
 {{template "footer.gohtml" . -}}

@@ -3,8 +3,10 @@
 package main
 
 import (
+	"carson.io/pkg/bytes"
 	io2 "carson.io/pkg/io"
 	"carson.io/pkg/tpl/funcs"
+	"context"
 	"fmt"
 	filepath2 "github.com/CarsonSlovoka/go-pkg/v2/path/filepath"
 	"github.com/CarsonSlovoka/go-pkg/v2/tpl/template"
@@ -50,7 +52,7 @@ func init() {
 
 			`url\\ts\\.*`,
 
-			`url\\blog\\.*\.md`,   // 不需要source，留下html即可
+			// `url\\blog\\.*\.md`,   // ~~不需要source，留下html即可~~ md也改成可以有fontMatter即可單獨存在，所以也要保留
 			`url\\blog\\test\\.*`, // 測試用的檔案都不複製
 		}, funcs.SiteContext{ // 設定預設值，注意，這裡的ctx是獨立的，各個頁面可以針對該ctx進行修改，都不會影響到彼此
 			Title:            "Carson-Blog",
@@ -61,7 +63,11 @@ func init() {
 	}
 }
 
-func render(src, dst string, tmplFiles []string) error {
+func render(src, dst string, ctx *struct {
+	funcs.SiteContext
+	Filepath string
+	context.Context
+}, tmplFiles []string) error {
 	dstFile, err := os.Create(dst)
 	if err != nil {
 		return err
@@ -78,8 +84,8 @@ func render(src, dst string, tmplFiles []string) error {
 			Funcs(funcs.GetUtilsFuncMap()).
 			ParseFiles(parseFiles...),
 	)
-	ctx := config.SiteContext       // copy數值過去，避免原本的SiteContext被異動，注意之所以能這樣用是因為我們的SiteContext目前都沒有存在任何指標類的成員，如果有指標類的成員，這些數值會變成共用，就會不安全要避免
-	return t.Execute(dstFile, &ctx) // 傳指標過去，因為我們希望能更自由的去修改其數值
+	// ctx := config.SiteContext       // copy數值過去，避免原本的SiteContext被異動，注意之所以能這樣用是因為我們的SiteContext目前都沒有存在任何指標類的成員，如果有指標類的成員，這些數值會變成共用，就會不安全要避免
+	return t.Execute(dstFile, ctx) // 傳指標過去，因為我們希望能更自由的去修改其數值
 }
 
 func build(outputDir string) error {
@@ -126,20 +132,55 @@ func build(outputDir string) error {
 		}
 
 		filePathList, _ := filepath2.CollectFiles("url\\", config.excludeFiles)
-		for _, src := range filePathList {
+		for _, srcPath := range filePathList {
 			// dst := filepath.Join("../docs/", strings.Replace(src, "url\\", "", 1)) // filepath.Join反斜線會自動修正，所以這樣也可以
-			dst := filepath.Join(outputDir, strings.Replace(src, "url\\", "", 1))
-			// fmt.Println(dst)
-			if filepath.Ext(dst) == ".gohtml" {
+			dst := filepath.Join(outputDir, strings.Replace(srcPath, "url\\", "", 1))
+
+			ctx := &struct {
+				funcs.SiteContext
+				Filepath string
+				context.Context
+			}{
+				config.SiteContext,
+				"",
+				nil,
+			}
+			switch filepath.Ext(dst) {
+			case ".gohtml":
 				dst = dst[:len(dst)-6] + "html"
-				if err = render(src, dst, tmplFiles); err != nil {
+				ctx.Filepath = srcPath
+				if err = render(srcPath, dst, ctx, tmplFiles); err != nil {
 					return err
 				}
-				continue
-			}
+			case ".md":
+				dst = dst[:len(dst)-2] + "html"
+				var (
+					src []byte
+					fm  *FrontMatter
+				)
 
-			if err = io2.CopyFile(src, dst); err != nil {
-				return err
+				src, err = os.ReadFile(srcPath)
+				if err != nil {
+					panic(err)
+				}
+				fm, _, err = bytes.GetFrontMatter[FrontMatter](src, false)
+				if err != nil {
+					panic(err)
+				}
+				if fm == nil { // 表示這個檔案沒有frontMatter，就不處理
+					continue
+				}
+				ctx.Context = context.WithValue(context.TODO(), "frontMatter", fm)
+				ctx.Filepath = strings.TrimPrefix(srcPath, "url") // 這個路徑是給md用的，它裡面預設已經在url路徑，所以不用在加)
+				srcPath = filepath.Join("url/tmpl", fm.Layout)
+				if err = render(srcPath, dst, ctx, tmplFiles); err != nil {
+					return err
+				}
+			default:
+				// 複製js, css...等其他檔案
+				if err = io2.CopyFile(srcPath, dst); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -169,7 +210,7 @@ func BuildServer(isLocalMode bool) (server *http.Server, listener net.Listener) 
 		case "":
 			for {
 				// 1. 省略.html
-				if _, err := os.Stat(curFilepath + ".gohtml"); !os.IsNotExist(err) {
+				if _, err = os.Stat(curFilepath + ".gohtml"); !os.IsNotExist(err) {
 					/* 不需要增加額外的計算
 					if strings.HasSuffix(r.URL.Path, "/") {
 						r.URL.Path = strings.TrimSuffix(r.URL.Path, "/") // 這個會影響到path.Dir，Dir(main/abc/) => main/abc  Dir(main/abc) => main/
@@ -205,7 +246,7 @@ func BuildServer(isLocalMode bool) (server *http.Server, listener net.Listener) 
 		case ".gohtml":
 			src := filepath.Join(string(rootDir), r.URL.Path)
 
-			if _, err := os.Stat(src); os.IsNotExist(err) {
+			if _, err = os.Stat(src); os.IsNotExist(err) {
 				log.Println(err)
 				return
 			}
@@ -223,7 +264,16 @@ func BuildServer(isLocalMode bool) (server *http.Server, listener net.Listener) 
 			)
 
 			ctx := config.SiteContext // 複製，使其能夠被修改而不影響原本的物件(注意如果物件本身有其他指標類的結構，此種複製方法是不安全的，該類的數值修改會影響到本體)
-			if err := t.Execute(w, &ctx); err != nil {
+			// if err = t.Execute(w, &ctx); err != nil {
+			if err = t.Execute(w, &struct {
+				funcs.SiteContext
+				Filepath string
+				context.Context
+			}{
+				ctx,
+				src,
+				nil,
+			}); err != nil {
 				log.Printf("%s\n", err.Error())
 			}
 		/* 交給http.FileServer(http.Dir()).ServeHTTP(w, r)已經會自行處理MIME_types
@@ -232,6 +282,70 @@ func BuildServer(isLocalMode bool) (server *http.Server, listener net.Listener) 
 		case ".css":
 			w.Header().Set("Content-Type", "text/css; charset=utf-8")
 		*/
+		case ".md":
+			if r.URL.Query().Has("raw") {
+				http.FileServer(rootDir).ServeHTTP(w, r)
+				return
+			}
+
+			srcPath := filepath.Join(string(rootDir), r.URL.Path)
+			if _, err = os.Stat(srcPath); os.IsNotExist(err) {
+				log.Println(err)
+				return
+			}
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+			var src []byte
+			src, err = os.ReadFile(srcPath)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			var fm *FrontMatter
+
+			fm, _, err = bytes.GetFrontMatter[FrontMatter](src, false)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+			if fm == nil {
+				http.Error(w, "此md檔案沒有frontMatter", http.StatusBadRequest)
+				return
+			}
+
+			layoutPath := filepath.Join("url/tmpl", fm.Layout)
+
+			var parseFiles []string
+			parseFiles, err = template.GetAllTmplName(os.ReadFile, layoutPath, tmplFiles) // 從layoutPath之中獲取所有用到的tmpl
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			parseFiles = append(parseFiles, layoutPath)
+
+			t := htmlTemplate.Must(
+				htmlTemplate.New(filepath.Base(layoutPath)).
+					Funcs(funcs.GetUtilsFuncMap()).
+					ParseFiles(parseFiles...),
+			)
+
+			siteCtx := config.SiteContext // copy
+			ctx := context.WithValue(context.TODO(), "frontMatter", fm)
+			if err = t.Execute(w, &struct {
+				funcs.SiteContext
+				Filepath string
+				context.Context
+			}{
+				siteCtx,
+				strings.TrimPrefix(srcPath, "url"), // 這個路徑是給md用的，它裡面預設已經在url路徑，所以不用在加)
+				ctx,
+			}); err != nil {
+				log.Printf("%s\n", err.Error())
+			}
+
 		default:
 			http.FileServer(rootDir).ServeHTTP(w, r)
 		}
