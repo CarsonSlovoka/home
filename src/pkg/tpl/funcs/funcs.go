@@ -96,7 +96,7 @@ func GetUtilsFuncMap() map[string]any {
 	funcMap["safeHTML"] = func(val string) template.HTML { // 承諾此數值是安全的，不需要額外的跳脫字元來輔助
 		return template.HTML(val)
 	}
-	funcMap["md"] = func(srcPath string, ctx struct {
+	funcMap["md"] = func(srcPath string, ctx *struct {
 		SiteContext
 		Filepath string
 		context.Context
@@ -174,6 +174,17 @@ func GetUtilsFuncMap() map[string]any {
 		// c := ctx.(*SiteContext)                        // 將any斷言成某物件
 		// c.TableOfContents = renderToc(rootNode, "toc") // 此時的c表示ctx，更新ctx的內容
 		ctx.SiteContext.TableOfContents = renderToc(rootNode, "toc")
+
+		if ctx.Context != nil {
+			// 表示這個是一個單獨可渲染的md檔案，將以frontMatter為主
+
+			/* 只能對md裡面的內容作修改，改動樣版裡面的參數要在template.Execute就設定好
+			fm := reflect.ValueOf(ctx.Context.Value("frontMatter")).Elem()
+			disableMarkMap := fm.FieldByName("Disable").FieldByName("MarkMap").Bool() // 第一個FieldByName找到的是struct
+			ctx.SiteContext.EnableMarkMapToc = !disableMarkMap
+			*/
+		}
+
 		return template.HTML(buf.String())
 	}
 	funcMap["debug"] = func(a ...any) string {

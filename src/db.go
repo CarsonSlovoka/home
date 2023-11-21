@@ -40,8 +40,12 @@ type FrontMatter struct {
 	// Draft todo: 如果為草稿, build的時候，就不會導出此頁面
 	Draft bool
 
-	CreateTime  time.Time `json:"date"`
-	LastModTime time.Time `json:"lastMod"`
+	Disable struct {
+		MarkMap bool `json:"markMap"`
+	}
+
+	CreateTime  time.Time `json:"cTime"`
+	LastModTime time.Time `json:"mTime"`
 }
 
 func init() {
