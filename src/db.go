@@ -37,15 +37,15 @@ type FrontMatter struct {
 		}
 	}
 
-	// Draft todo: 如果為草稿, build的時候，就不會導出此頁面
+	// Draft 如果為草稿, build時不會導出此頁面；run的時候，會告訴用戶還在規劃中敬請期待等類似字眼
 	Draft bool
 
 	Disable struct {
 		MarkMap bool `json:"markMap"`
 	}
 
-	CreateTime    time.Time `json:"cTime"`
-	LastModTime   time.Time `json:"mTime"`
+	CreateTime  time.Time `json:"cTime"`
+	LastModTime time.Time `json:"mTime"`
 }
 
 func init() {

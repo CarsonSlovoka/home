@@ -162,6 +162,12 @@ func build(outputDir string) error {
 				if fm == nil { // 表示這個檔案沒有frontMatter，就不處理
 					continue
 				}
+
+				if fm.Draft {
+					// 草稿不渲染
+					continue
+				}
+
 				ctx.Context = context.TODO()
 				ctx.FrontMatter = *fm
 				ctx.Filepath = strings.TrimPrefix(srcPath, "url") // 這個路徑是給md用的，它裡面預設已經在url路徑，所以不用在加)
@@ -303,6 +309,11 @@ func BuildServer(isLocalMode bool) (server *http.Server, listener net.Listener) 
 
 			if fm == nil {
 				http.Error(w, "此md檔案沒有frontMatter", http.StatusBadRequest)
+				return
+			}
+
+			if fm.Draft {
+				http.Error(w, "此md為草稿，還在規劃中，敬請期待", http.StatusBadRequest)
 				return
 			}
 
