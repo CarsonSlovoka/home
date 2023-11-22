@@ -3,13 +3,16 @@
 package main
 
 import (
-	"carson.io/pkg/bytes"
+	"bytes"
+	bytes2 "carson.io/pkg/bytes"
 	io2 "carson.io/pkg/io"
+	. "carson.io/pkg/utils"
 	"context"
 	"fmt"
 	filepath2 "github.com/CarsonSlovoka/go-pkg/v2/path/filepath"
 	"github.com/CarsonSlovoka/go-pkg/v2/tpl/template"
 	htmlTemplate "html/template"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -62,11 +65,6 @@ func init() {
 }
 
 func render(src, dst string, ctx *PageContext, tmplFiles []string) error {
-	dstFile, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-
 	parseFiles, err := template.GetAllTmplName(os.ReadFile, src, tmplFiles)
 	if err != nil {
 		return err
@@ -78,8 +76,41 @@ func render(src, dst string, ctx *PageContext, tmplFiles []string) error {
 			Funcs(tmplFuncMaps).
 			ParseFiles(parseFiles...),
 	)
-	// ctx := config.SiteContext       // copy數值過去，避免原本的SiteContext被異動，注意之所以能這樣用是因為我們的SiteContext目前都沒有存在任何指標類的成員，如果有指標類的成員，這些數值會變成共用，就會不安全要避免
-	return t.Execute(dstFile, ctx) // 傳指標過去，因為我們希望能更自由的去修改其數值
+
+	buf := bytes.NewBuffer(make([]byte, 0))
+	if err = t.Execute(buf, ctx); err != nil {
+		return err
+	}
+	bs, _ := io.ReadAll(buf)
+
+	// 檔案內容如果完全一樣，就不再寫入
+	// TODO:但是LastBuildTime會用當天的日期創建，所以就算資料沒異動，到隔天再重建還是會被修改
+	if _, err = os.Stat(dst); !os.IsNotExist(err) {
+		bs2, err := os.ReadFile(dst)
+		if err != nil {
+			return err
+		}
+
+		if bytes.Compare(bs, bs2) == 0 {
+			PInfo.Printf("檔案: %q | 因內容沒有異動，故不渲染 \n", dst)
+			return nil
+		}
+	}
+
+	var dstFile *os.File
+	dstFile, err = os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = dstFile.Close()
+	}()
+
+	if _, err = dstFile.Write(bs); err != nil {
+		return err
+	}
+	POk.Printf("檔案: %q | 已更新 \n", dst)
+	return nil
 }
 
 func build(outputDir string) error {
@@ -155,7 +186,7 @@ func build(outputDir string) error {
 				if err != nil {
 					panic(err)
 				}
-				fm, _, err = bytes.GetFrontMatter[FrontMatter](src, false)
+				fm, _, err = bytes2.GetFrontMatter[FrontMatter](src, false)
 				if err != nil {
 					panic(err)
 				}
@@ -301,7 +332,7 @@ func BuildServer(isLocalMode bool) (server *http.Server, listener net.Listener) 
 
 			var fm *FrontMatter
 
-			fm, _, err = bytes.GetFrontMatter[FrontMatter](src, false)
+			fm, _, err = bytes2.GetFrontMatter[FrontMatter](src, false)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
