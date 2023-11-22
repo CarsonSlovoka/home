@@ -1,3 +1,13 @@
+---
+{
+  "title": "discord教學",
+  "tags": [ "discord", "tutorial", "web-hooks" ],
+  "layout": "blog/blog.base.gohtml",
+  "cTime": "2022-09-06T18:42:00+08:00",
+  "mTime": "2022-09-06T18:42:00+08:00"
+}
+---
+
 # discord
 
 ## [搜尋](https://support.discord.com/hc/en-us/articles/115000468588)

@@ -1,3 +1,13 @@
+---
+{
+  "title": "GUI",
+  "tags": [ "gui", "gdi", "gdi-plus", "opengl", "directx" ],
+  "layout": "blog/blog.base.gohtml",
+  "cTime": "2022-11-04T00:00:00+08:00",
+  "mTime": "2022-11-04T00:00:00+08:00"
+}
+---
+
 # GUI (圖形化介面)
 
 - gdi

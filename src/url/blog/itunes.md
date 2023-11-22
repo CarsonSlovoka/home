@@ -1,3 +1,13 @@
+---
+{
+  "title": "itunes",
+  "tags": [ "itunes", "iphone", "backup" ],
+  "layout": "blog/blog.base.gohtml",
+  "cTime": "2022-09-06T17:14:00+08:00",
+  "mTime": "2022-09-06T17:14:00+08:00"
+}
+---
+
 # iphone作業系統更新
 
 ## 關閉自動備份
@@ -5,7 +15,7 @@
 1. 查找itunes.exe的位置: 打開powershell，輸入
     > gcm itunes.exe
 
-3. 關閉自動備份:
+2. 關閉自動備份:
    這邊的範例假設位於ProgramFiles下，可自行替換成您的iTunes.exe路徑
 
     ```
