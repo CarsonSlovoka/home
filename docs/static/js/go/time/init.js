@@ -1,5 +1,4 @@
-import {Now} from "./time.js"
-
+import { Now } from "./time.js";
 export const time = {
-  Now,
-}
+    Now,
+};

@@ -1,0 +1,772 @@
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="source-hash" content="" >
+    <meta charset="utf-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="icon" sizes="any" type="image/svg+xml" href="/static/img/favicon.svg">
+<title>powershell</title> 
+<link rel="stylesheet" href="/static/css/styles.css">
+
+  <script src="/static/js/clipboard/copy-pre.js"></script>
+
+    <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"> 
+      <script src="/static/js/pkg/d3.js"></script> 
+      <script src="/static/js/pkg/markmap-view.js"></script>
+      <script type="module"
+              src="/static/js/uml/toc_markmap.js"></script> 
+      <script defer src="/static/js/pkg/webfontloader.js"></script> 
+    </head>
+
+<script type="module" src="/static/js/bs/components/navbar.js"></script>
+
+<link rel="icon" sizes="any" type="image/svg+xml" href="/static/img/favicon.svg">
+<nav class="navbar fixed-top" style="background-image: url('/static/img/bg/orange.svg')">
+  <a href="/index.html"><img src="/static/img/favicon.svg" class="logo" alt="logo" width="48" height="48"/></a>
+  <ul>
+    <li><a href="/">HOME</a></li>
+    <li><a href="/blog/">Blog</a></li>
+    <li class="dropdown">
+      <span>Tutorial</span>
+      <ul class="dropdown-menu">
+        <li><a href="/tutorial/svg/">SVG</a></li>
+      </ul>
+    </li>
+  </ul>
+  <br>
+</nav>
+<body class="container">
+<div class="mt-6"></div>
+<small class="text-muted">最後建立日期: 2023-11-22</small>
+
+    <h1 id="powershell">Powershell</h1>
+<ul>
+<li>查找有哪些成員或者方法可以使用: <code>Get-Member</code></li>
+<li>列出所有環境變數: <code>Get-ChildItem Env:</code></li>
+<li>查找變數: <code>Get-Variable</code> 後面可以接篩選條件</li>
+<li>創建psd1指令: <code>New-ModuleManifest</code></li>
+<li>生成guid指令: <code>Microsoft.PowerShell.Utility\New-Guid</code></li>
+<li><code>Get-PSRepository</code></li>
+<li>更新powershell: <code>winget install --id Microsoft.Powershell --source winget</code>
+<ul>
+<li>會安裝在: <code>%ProgramFiles%\PowerShell\7\pwsh.exe</code></li>
+<li>查看powershell相關應用程式的位置: <code>gcm powershell, pwsh</code></li>
+</ul>
+</li>
+<li><a href="https://learn.microsoft.com/zh-tw/powershell/scripting/whats-new/differences-from-windows-powershell?view=powershell-7.3#powershell-executable-changes">開啟powershell7</a>:
+pwsh</li>
+<li><a href="https://github.com/PowerShell/PowerShell/">powershell github</a></li>
+</ul>
+<h2 id="ide">IDE</h2>
+<ul>
+<li><a href="https://learn.microsoft.com/zh-tw/powershell/scripting/windows-powershell/ise/introducing-the-windows-powershell-ise?view=powershell-7.3">powershell_ise.exe</a>:
+直接在powershell中輸入<code>powershell_ise.exe</code>即可開啟
+<ul>
+<li>它的所在路徑: <code>%winDir%\%System32\WindowsPowerShell\v1.0\powershell_ise.exe</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="debug">DEBUG</h2>
+<ul>
+<li>
+<p><code>Wait-Debugger</code>在代碼中使用此指令，執行到此時會強制觸發debug程序</p>
+</li>
+<li>
+<p>Get-PSBreakPoint</p>
+</li>
+<li>
+<p>Set-PSBreakpoint -Script &quot;calendar.psm1&quot; -Line 137</p>
+</li>
+<li>
+<p>設定好之後只要接下powershell有執行到該腳本，就會自動觸發debug模式，觸發debug的時候，前面會面<code>[DBG]:</code>的字眼</p>
+<ul>
+<li>
+<p>在dbg的模式下，可以使用<code>?</code>來查看所有debug可以使用的命令</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>s, stepInto         Single step (step into functions, scripts, etc.)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>v, stepOver         Step to next statement (step over functions, scripts, etc.)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>o, stepOut          Step out of the current function, script, etc.<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>c, continue         Continue operation<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>q, quit             Stop operation and exit the debugger<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>d, detach           Continue operation and detach the debugger.<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>k, Get-PSCallStack Display call stack<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>l, list             List source code for the current script.<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Use &#34;list&#34; to start from the current line, &#34;list &lt;m&gt;&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>to start from line &lt;m&gt;, and &#34;list &lt;m&gt; &lt;n&gt;&#34; to list &lt;n&gt;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>lines starting from line &lt;m&gt;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"> </span>&lt;enter&gt;             Repeat last command if it was stepInto, stepOver or list<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>?,<span style="color:#bbb"> </span>h                displays this help message.<span style="color:#bbb">
+</span></span></span></code></pre><ul>
+<li><code>q</code>:放棄debug以及中斷不再繼續執行</li>
+<li>您可以善用<code>k</code>, 來得到目前您腳本的Location，就可以在使用<a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/set-psbreakpoint?view=powershell-7.3">Set-PSBreakpoint</a>來增加中斷點
+<blockquote>
+<p><code>Set-PSBreakpoint -Script &quot;calendar.psm1&quot; -Line 125</code> 設定好之後直接用<code>o</code>(stepOut)應該就可以很快地跑到您下中斷點的位置</p>
+</blockquote>
+</li>
+</ul>
+<p>至於您對哪一個變數有興趣，直接在命令上打出該變數就可以查看</p>
+</li>
+</ul>
+</li>
+<li>
+<p>刪除所有中斷點 <code>Get-PSBreakpoint | Remove-PSBreakPoint</code></p>
+</li>
+</ul>
+<h2 id="command">Command</h2>
+<ul>
+<li>查找command來至於哪一個模組: <code>Get-Command My-Command | select -exp Source</code></li>
+<li>查看該函數的實作內容: <code>get-command myCmd | format-list</code>當中的Definition可以看到</li>
+<li><code>(get-command xxx).Definition</code></li>
+<li>查找command模組資訊: <code>(get-command xxx).Module</code>
+<ul>
+<li>查找某個模組下所有可以使用的指令 <code>Get-Command -Module MyModule</code></li>
+<li>查找模塊的路徑: <code>Get-Module -Name utils | format-List -Property Path, Name</code></li>
+<li>取的可用的模組: <code>Get-Module</code></li>
+</ul>
+</li>
+<li>找尋command <code>get-command -Name *id*</code></li>
+<li>找尋command開頭須符合 <code>get-command -Name id*</code></li>
+<li>創建資料夾: <code>New-Item &quot;myDir&quot; -ItemType Directory</code> (已經存在會報錯)</li>
+</ul>
+<p>如果想找command的定義，除了查看Definition以外，也可以去找該模塊的路徑，使用Get-Module有可能還是沒辦法查看到完整的路徑</p>
+<p>但如果您是系統指令，例如<code>Get-command Get-StartApps</code> <a href="https://ccmcache.wordpress.com/2017/10/15/use-powershell-to-dynamically-manage-windows-10-start-menu-layout-xml-files/">Get-StartApps就位於</a></p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>Get-command Get-StartApps<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 知道這個指令來自於StartLayout模塊</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$env:PSModulePath.Split(&#34;;&#34;)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#998;font-style:italic"># C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules\StartLayout # 此路徑應該是PSModulePath的最後一個</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#998;font-style:italic"># win+R: 輸入: shell:AppsFolder</span><span style="color:#bbb">
+</span></span></span></code></pre><h3 id="alias">Alias</h3>
+<ul>
+<li><code>Get-Alias</code> 如果找不到, 請使用Get-Command查找一次該別名的函數，在使用<code>Get-Alias</code>就會出了. (雖然Get-Alias可能會看不到，但其實直接使用alias還是可以呼叫該command成功)</li>
+<li><code>Get-Alias swa | Get-Member</code></li>
+<li>查找指令的alias(知道完整指令查找別名): <code>Get-Alias -Definition MyFullCmdName</code></li>
+</ul>
+<blockquote>
+<p>如果是PowerShell 5.1還是會受到ExecutionPolicy所影響，如果沒有設定，<code>Get-Help</code>
+就可能會看不到該command的Alias <code>Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -F</code></p>
+</blockquote>
+<hr>
+<p>常用指令的別名</p>
+<table>
+<thead>
+<tr>
+<th>Fullname</th>
+<th>Alias</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ForEach-Object</td>
+<td>foreach</td>
+<td></td>
+</tr>
+<tr>
+<td>Write-Output</td>
+<td>write, <strong>echo</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>Where-Object</td>
+<td>where</td>
+<td></td>
+</tr>
+<tr>
+<td>Remove-Item</td>
+<td><strong>ri</strong>, rm, <strong>rmdir</strong>, <strong>del</strong>, erase, rd</td>
+<td>可以刪除物件、檔案、資料夾</td>
+</tr>
+<tr>
+<td>Get-ChildItem</td>
+<td>gci, <strong>ls</strong>, <strong>dir</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>Start-Process</td>
+<td><strong>start</strong></td>
+<td>開啟目錄或者檔案</td>
+</tr>
+</tbody>
+</table>
+<h3 id="get-help">Get-Help</h3>
+<p>除了查詢指定的命令以外，也可以查看參數的意思，例如:</p>
+<pre><code>Get-Help Select-Object -Parameter ExpandProperty
+</code></pre>
+<p>output:</p>
+<table>
+<thead>
+<tr>
+<th>ExpandProperty</th>
+<th>string</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>必要?</td>
+<td>false</td>
+</tr>
+<tr>
+<td>位置?</td>
+<td>已命名</td>
+</tr>
+<tr>
+<td>接受管線輸入?</td>
+<td>false</td>
+</tr>
+<tr>
+<td>參數集名稱</td>
+<td>SkipLastParameter, DefaultParameter</td>
+</tr>
+<tr>
+<td>別名</td>
+<td>無</td>
+</tr>
+<tr>
+<td>動態?</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<h2 id="uwp-universal-windows-platformhttpslearnmicrosoftcomzh-twwindowsappsdesktopmodernizedesktop-to-uwp-extendshow-a-modern-xaml-ui"><a href="https://learn.microsoft.com/zh-tw/windows/apps/desktop/modernize/desktop-to-uwp-extend#show-a-modern-xaml-ui">UWP (Universal Windows Platform)</a></h2>
+<p>UWP(通用Windows平台)可以幫忙創建應用程式。
+UWP是使用WinRT API來實現相關功能</p>
+<p>WinRT API: 是使用c++語言所實現，它的底層技術使用windows API主要靠C語言實現。
+WinRT是基於COM語言，這是一種與語言無關，只要滿足其接口就可以調用該API</p>
+<ul>
+<li>列出所有UWP元件: <code>Get-AppxPackage -Name *xaml*</code> (不適用powershell7的版本)</li>
+</ul>
+<h2 id="windows-powershell-51--powershell-7x-httpslearnmicrosoftcomzh-twpowershellscriptingwhats-newdifferences-from-windows-powershellviewpowershell-73"><a href="https://learn.microsoft.com/zh-tw/powershell/scripting/whats-new/differences-from-windows-powershell?view=powershell-7.3">Windows PowerShell 5.1 與 PowerShell 7.x 之間的差異</a></h2>
+<p>Windows PowerShell 5.1 建置在 .NET Framework v4.5 之上。</p>
+<p>PowerShell 6.0 版成為以 .NET Core 2.0 為基礎的開放原始碼專案。</p>
+<p>從.NET Framework移至 .NET Core 可讓 PowerShell 成為跨平臺解決方案使得PowerShell可在 Windows、macOS 和 Linux 上執行。</p>
+<blockquote>
+<p>簡單來說<code>.NET Framework</code>只能在windows平台執行，而<code>.NET Core</code>是一個跨平台專案，可以在{Windows, macOS, Linux}上執行</p>
+</blockquote>
+<h2 id="powershell7httpslearnmicrosoftcomzh-twprevious-versionspowershellscriptingwhats-newwhat-s-new-in-powershell-70viewpowershell-71where-can-i-install-powershell"><a href="https://learn.microsoft.com/zh-tw/previous-versions/powershell/scripting/whats-new/what-s-new-in-powershell-70?view=powershell-7.1#where-can-i-install-powershell">powershell7支持那些系統</a></h2>
+<pre><code>Windows 8.1 和 10
+Windows Server 2012、2012 R2、2016 及 2019
+macOS 10.13+
+Red Hat Enterprise Linux (RHEL) / CentOS 7
+Fedora 30+
+Debian 9
+Ubuntu LTS 16.04+
+Alpine Linux 3.8+
+</code></pre>
+<p>其中<a href="https://learn.microsoft.com/zh-tw/powershell/scripting/whats-new/what-s-new-in-powershell-73?view=powershell-7.3#breaking-changes-and-improvements">Powershell 7.3已確定不在能windows7執行</a></p>
+<h2 id="powershelleditorconfighttpsgithubcompowershellpowershellblob7fb867167e9702b292c643f6a4f4cc934acf4811editorconfig"><a href="https://github.com/PowerShell/PowerShell/blob/7fb867167e9702b292c643f6a4f4cc934acf4811/.editorconfig">powershell.editorconfig</a></h2>
+<h2 id="function">function</h2>
+<pre><code>&quot;&quot; 用雙引號包住的字串，如果該字串內容含有變數，會自動將變數轉為其變數的數值
+'' 用單引號包住的內容，不會對內容再進行解析，即當中有變數也會視為是字串
+</code></pre>
+<h2 id="unit-test">Unit Test</h2>
+<p>請使用<a href="https://github.com/pester/pester">Pester</a></p>
+<p>在powershell5之中，默認已經有裝進去，如果你使用指令</p>
+<blockquote>
+<p>Get-Command Invoke-Pester</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>CommandType</th>
+<th>Name</th>
+<th>Version</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Function</td>
+<td>Invoke-Pester</td>
+<td>3.4.0</td>
+<td>Pester</td>
+</tr>
+</tbody>
+</table>
+<p>他的位置</p>
+<pre><code>start &quot;$env:ProgramFiles\WindowsPowerShell\Modules\Pester\3.4.0&quot;
+</code></pre>
+<p>建議去<a href="https://pester.dev/docs/introduction/installation#installing-from-psgallery-on-windows-10-or-windows-server-2016">更新它</a>，使用以下指令更新:</p>
+<pre><code>Install-Module -Name Pester -Force -SkipPublisherCheck
+</code></pre>
+<p>安裝完之後關閉後重開即可</p>
+<p>完成之後會有兩個Pester，一個是3.4另一個為5.4</p>
+<pre><code>start &quot;$env:ProgramFiles\WindowsPowerShell\Modules\Pester\3.4.0&quot;
+start &quot;$env:ProgramFiles\WindowsPowerShell\Modules\Pester\5.4.1&quot;
+</code></pre>
+<p>但是如果是透過<code>SkipPublisherCheck</code>安裝完之後，你要在<code>Get-Command Invoke-Pester</code>看到內容會看不到，要先使用指令</p>
+<pre><code>Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -F
+</code></pre>
+<h2 id="cmdlet">cmdlet</h2>
+<p>Commandlet: 通常由一個<code>動詞+名詞</code>組成，例如<code>Get-Process</code>、<code>New-Item</code>等等</p>
+<p>Cmdlet一般而言有三個條件</p>
+<ol>
+<li>
+<p>函數名稱以動詞開頭，例如:{Get-, Set-, New-}等等: 算是慣例，沒有滿足，也不會怎樣。</p>
+<blockquote>
+<p>警告: 有些來自模組 'xxx' 的匯入命令名稱包含未核准的動詞，因此可能不易搜尋。如需核准動詞的清單，請輸入 <a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-verb?view=powershell-7.3">Get-Verb</a></p>
+<p>找尋特定的動詞是否有在該列表 <code>Get-Verb | findstr XXX</code> 注意XXX有區分大小寫</p>
+<p>如果你要找是哪一個函數不合法可以加上Verbose，例如 Import-Module xxx -Verbose 如果發現函數名稱不符合指定的動詞就會告訴您</p>
+</blockquote>
+<p>如果你的名稱不想要遵守指定的動詞規範，那麼函數名稱可以不要是用<code>-</code>來串接，例如<code>Create-Shortcut</code>改為<code>CreateShortcut</code>，這樣也不會跳出警告，但搜尋速度應該還是有些影響，建議盡量遵守規範！</p>
+</li>
+<li>
+<p>必須要有一個或多個參數:
+因為Cmdlet的設計是在powershell管道中提供小型命令，他們通常需要處理輸入和輸出，而輸入和輸出數據都是透過參數來傳遞，因此如果一個函數沒有參數，它就不能接受輸入或者向外輸出數據，就不符合Cmdlet的設計理念。</p>
+</li>
+<li>
+<p>必須要有回傳值</p>
+<p>在powershell中，任何沒有被附值給變量的語句或者表達式的結果，都會自動被視為返回值</p>
+<p>如果最後一行改成<code>echo $sum</code>，這種就不算返回值</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>function Add-Numbers ($a, $b) {<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"> </span>$sum = $a + $b<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"> </span>$sum  <span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 返回 $sum 的值</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span></code></pre></li>
+</ol>
+<p>Cmdlet函數可以透過管道<code>|</code>來串接</p>
+<ul>
+<li>檢驗command是不是cmdlet的型別: <code>Get-Command myCmd | Select-Object CommandType</code> 如果是，回傳會是Cmdlet，否則可能返回其他類型，例如<code>Function</code></li>
+<li><code>Get-Command -Name C* -CommandType Cmdlet</code>: 列出所有C開頭且是Cmdlet型別的命令
+<ul>
+<li>但是我試的結果都是Function，感覺不需要太糾結於是Function還是Cmdlet</li>
+</ul>
+</li>
+</ul>
+<h2 id="parametersetshttpslearnmicrosoftcomen-uspowershellmodulemicrosoftpowershellcoreaboutabout-parameter-setsviewpowershell-73"><a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_parameter_sets?view=powershell-7.3">ParameterSets</a></h2>
+<p>假設我們參數可能有些可選項，然後有一些是要根據不同的流程，來決定是否要放那些參數，此時DefaultParameterSetName就可以幫上忙</p>
+<p>它的好處是當模擬兩可的時候，自動提是可以自動幫您依據DefaultParameterSetName的內容帶出需要完成的參數</p>
+<p>此外它有<code>$PSCmdlet.ParameterSetName</code>，可以知道當前是選擇哪一個，如果不使用，將要自己多一個參數來確定到底是執行哪一個</p>
+<p>另外如果不使用ParameterSetName，每個流程的必填也沒辦法避免，變成要把所有的參數都打出來，例如你可能有OCR, Watch等流程，當您現在想走Watch流程，依此理應當只要填入Watch必要的參數即可，但是當您不使用ParameterSetName，那麼您沒辦法做到這件事情。</p>
+<p>例如</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#000;font-weight:bold">function</span> TestParameterSet {
+</span></span><span style="display:flex;"><span>    [<span style="color:#000;font-weight:bold">CmdletBinding</span>(DefaultParameterSetName=<span style="color:#d14">&#39;OCR&#39;</span>)] <span style="color:#998;font-style:italic"># 當我們只有輸入-Pram5的時候，它就會自動提示Param3的參數讓我們填，這就是DefaultParameterSetName的特色</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">param</span> (
+</span></span><span style="display:flex;"><span>        [<span style="color:#000;font-weight:bold">Parameter</span>(<span style="color:#000;font-weight:bold">ParameterSetName</span>=<span style="color:#d14">&#39;Watch&#39;</span>, <span style="color:#000;font-weight:bold">Mandatory</span>=<span style="color:#008080">$true</span>)]
+</span></span><span style="display:flex;"><span>        <span style="color:#008080">[string]</span><span style="color:#008080">$Param1</span>,
+</span></span><span style="display:flex;"><span>        [<span style="color:#000;font-weight:bold">Parameter</span>(<span style="color:#000;font-weight:bold">ParameterSetName</span>=<span style="color:#d14">&#39;Watch&#39;</span>, <span style="color:#000;font-weight:bold">Mandatory</span>=<span style="color:#008080">$false</span>)]
+</span></span><span style="display:flex;"><span>        <span style="color:#008080">[string]</span><span style="color:#008080">$Param2</span>,
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        [<span style="color:#000;font-weight:bold">Parameter</span>(<span style="color:#000;font-weight:bold">ParameterSetName</span>=<span style="color:#d14">&#39;OCR&#39;</span>, <span style="color:#000;font-weight:bold">Mandatory</span>=<span style="color:#008080">$true</span>)]
+</span></span><span style="display:flex;"><span>        <span style="color:#008080">[string]</span><span style="color:#008080">$Param3</span>,
+</span></span><span style="display:flex;"><span>        [<span style="color:#000;font-weight:bold">Parameter</span>(<span style="color:#000;font-weight:bold">ParameterSetName</span>=<span style="color:#d14">&#39;OCR&#39;</span>, <span style="color:#000;font-weight:bold">Mandatory</span>=<span style="color:#008080">$false</span>)]
+</span></span><span style="display:flex;"><span>        <span style="color:#008080">[string]</span><span style="color:#008080">$Param4</span>,
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic"># 必填</span>
+</span></span><span style="display:flex;"><span>        [<span style="color:#000;font-weight:bold">Parameter</span>(<span style="color:#000;font-weight:bold">Mandatory</span>=<span style="color:#008080">$true</span>)]
+</span></span><span style="display:flex;"><span>        <span style="color:#008080">[string]</span><span style="color:#008080">$Param5</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic"># 選填</span>
+</span></span><span style="display:flex;"><span>        [<span style="color:#000;font-weight:bold">Parameter</span>(<span style="color:#000;font-weight:bold">Mandatory</span>=<span style="color:#008080">$false</span>)]
+</span></span><span style="display:flex;"><span>        <span style="color:#008080">[string]</span><span style="color:#008080">$Param6</span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> (<span style="color:#008080">$PSCmdlet</span>.<span style="color:#000;font-weight:bold">ParameterSetName</span> <span style="color:#000;font-weight:bold">-eq</span> <span style="color:#d14">&#39;Watch&#39;</span>) { <span style="color:#998;font-style:italic"># ParameterSetName可以決定$PSCmdlet.ParameterSetName的內容，如果您不用ParameterSetName時，此時就必須再新增一個額外的變數來記錄您可能是要執行哪一個流程</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#0086b3">Write-Output</span> <span style="color:#d14">&#34;You&#39;ve chosen Watch.&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#0086b3">Write-Output</span> <span style="color:#d14">&#34;Param1: $Param1&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#0086b3">Write-Output</span> <span style="color:#d14">&#34;Param2: $Param2&#34;</span>
+</span></span><span style="display:flex;"><span>    } <span style="color:#000;font-weight:bold">elseif</span> (<span style="color:#008080">$PSCmdlet</span>.<span style="color:#000;font-weight:bold">ParameterSetName</span> <span style="color:#000;font-weight:bold">-eq</span> <span style="color:#d14">&#39;OCR&#39;</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#0086b3">Write-Output</span> <span style="color:#d14">&#34;You&#39;ve chosen OCR.&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#0086b3">Write-Output</span> <span style="color:#d14">&#34;Param3: $Param3&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#0086b3">Write-Output</span> <span style="color:#d14">&#34;Param4: $Param4&#34;</span>
+</span></span><span style="display:flex;"><span>   }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre><p>列出名稱為<code>TestParameterSet</code>的使用方法</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>PS&gt; (Get-Command TestParameterSet).ParameterSets | Select-Object -Property @{n=&#39;ParameterSetName&#39;;e={$_.name}},@{n=&#39;Parameters&#39;;e={$_.ToString()}}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>ParameterSetName Parameters<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#555">---</span>------------- ----------<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>OCR              -Param3 &lt;string&gt; -Param5 &lt;string&gt; [-Param4 &lt;string&gt;] [-Param6 &lt;string&gt;] [&lt;CommonParameters&gt;]<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Watch            -Param1 &lt;string&gt; -Param5 &lt;string&gt; [-Param2 &lt;string&gt;] [-Param6 &lt;string&gt;] [&lt;CommonParameters&gt;]<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>即<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>TestParameterSet -Param1 1 -Param5 5<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># OCR</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>TestParameterSet -Param3 3 -Param5 5<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># Watch</span><span style="color:#bbb">
+</span></span></span></code></pre><p>透過以上的指令，就可以列出這個命令的用法到底有哪些</p>
+<h2 id="httpslearnmicrosoftcomen-uswindowsconfigurationcustomize-and-export-start-layout-"><del><a href="https://learn.microsoft.com/en-us/windows/configuration/customize-and-export-start-layout">自定義開始佈局(磚塊牆)</a></del> (只能影響默認設定、不能修改當前的設定)</h2>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>Export-StartLayout -UseDesktopApplicationID -Path layout.xml<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># Path之後的名稱不重要，只是輸出到哪一個檔案而已</span><span style="color:#bbb">
+</span></span></span></code></pre><p>此指令會導出當前您開始選單中所看到的磚塊牆輸出到layout.xml之中，內容大概長成下面這樣</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000080">&lt;LayoutModificationTemplate</span> <span style="color:#008080">xmlns:defaultlayout=</span><span style="color:#d14">&#34;http://schemas.microsoft.com/Start/2014/FullDefaultLayout&#34;</span>
+</span></span><span style="display:flex;"><span>                            <span style="color:#008080">xmlns:start=</span><span style="color:#d14">&#34;http://schemas.microsoft.com/Start/2014/StartLayout&#34;</span> <span style="color:#008080">Version=</span><span style="color:#d14">&#34;1&#34;</span>
+</span></span><span style="display:flex;"><span>                            <span style="color:#008080">xmlns=</span><span style="color:#d14">&#34;http://schemas.microsoft.com/Start/2014/LayoutModification&#34;</span><span style="color:#000080">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000080">&lt;LayoutOptions</span> <span style="color:#008080">StartTileGroupCellWidth=</span><span style="color:#d14">&#34;6&#34;</span><span style="color:#000080">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000080">&lt;DefaultLayoutOverride&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000080">&lt;StartLayoutCollection&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#000080">&lt;defaultlayout:StartLayout</span> <span style="color:#008080">GroupCellWidth=</span><span style="color:#d14">&#34;6&#34;</span><span style="color:#000080">&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#000080">&lt;start:Group</span> <span style="color:#008080">Name=</span><span style="color:#d14">&#34;創作&#34;</span><span style="color:#000080">&gt;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#000080">&lt;start:Tile</span> <span style="color:#008080">Size=</span><span style="color:#d14">&#34;4x2&#34;</span> <span style="color:#008080">Column=</span><span style="color:#d14">&#34;2&#34;</span> <span style="color:#008080">Row=</span><span style="color:#d14">&#34;0&#34;</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#008080">AppUserModelID=</span><span style="color:#d14">&#34;microsoft.windowscommunicationsapps_8wekyb3d8bbwe!Microsoft.WindowsLive.Mail&#34;</span><span style="color:#000080">/&gt;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#000080">&lt;start:Tile</span> <span style="color:#008080">Size=</span><span style="color:#d14">&#34;1x1&#34;</span> <span style="color:#008080">Column=</span><span style="color:#d14">&#34;5&#34;</span> <span style="color:#008080">Row=</span><span style="color:#d14">&#34;3&#34;</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#008080">AppUserModelID=</span><span style="color:#d14">&#34;Microsoft.Office.OneNote_8wekyb3d8bbwe!microsoft.onenoteim&#34;</span><span style="color:#000080">/&gt;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#000080">&lt;start:Tile</span> <span style="color:#008080">Size=</span><span style="color:#d14">&#34;1x1&#34;</span> <span style="color:#008080">Column=</span><span style="color:#d14">&#34;5&#34;</span> <span style="color:#008080">Row=</span><span style="color:#d14">&#34;2&#34;</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#008080">AppUserModelID=</span><span style="color:#d14">&#34;Microsoft.Office.Desktop_8wekyb3d8bbwe!PowerPoint&#34;</span><span style="color:#000080">/&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#000080">&lt;/start:Group&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#000080">&lt;start:Group</span> <span style="color:#008080">Name=</span><span style="color:#d14">&#34;玩樂&#34;</span><span style="color:#000080">&gt;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#000080">&lt;start:Tile</span> <span style="color:#008080">Size=</span><span style="color:#d14">&#34;2x2&#34;</span> <span style="color:#008080">Column=</span><span style="color:#d14">&#34;0&#34;</span> <span style="color:#008080">Row=</span><span style="color:#d14">&#34;0&#34;</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#008080">AppUserModelID=</span><span style="color:#d14">&#34;Microsoft.XboxApp_8wekyb3d8bbwe!Microsoft.XboxApp&#34;</span><span style="color:#000080">/&gt;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#000080">&lt;start:Tile</span> <span style="color:#008080">Size=</span><span style="color:#d14">&#34;1x1&#34;</span> <span style="color:#008080">Column=</span><span style="color:#d14">&#34;3&#34;</span> <span style="color:#008080">Row=</span><span style="color:#d14">&#34;1&#34;</span> <span style="color:#008080">AppUserModelID=</span><span style="color:#d14">&#34;Microsoft.WindowsMaps_8wekyb3d8bbwe!App&#34;</span><span style="color:#000080">/&gt;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#000080">&lt;start:Tile</span> <span style="color:#008080">Size=</span><span style="color:#d14">&#34;1x1&#34;</span> <span style="color:#008080">Column=</span><span style="color:#d14">&#34;2&#34;</span> <span style="color:#008080">Row=</span><span style="color:#d14">&#34;1&#34;</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#008080">AppUserModelID=</span><span style="color:#d14">&#34;Microsoft.WindowsCalculator_8wekyb3d8bbwe!App&#34;</span><span style="color:#000080">/&gt;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#000080">&lt;start:Tile</span> <span style="color:#008080">Size=</span><span style="color:#d14">&#34;1x1&#34;</span> <span style="color:#008080">Column=</span><span style="color:#d14">&#34;3&#34;</span> <span style="color:#008080">Row=</span><span style="color:#d14">&#34;0&#34;</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#008080">AppUserModelID=</span><span style="color:#d14">&#34;Microsoft.ZuneMusic_8wekyb3d8bbwe!Microsoft.ZuneMusic&#34;</span><span style="color:#000080">/&gt;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#000080">&lt;start:Tile</span> <span style="color:#008080">Size=</span><span style="color:#d14">&#34;1x1&#34;</span> <span style="color:#008080">Column=</span><span style="color:#d14">&#34;2&#34;</span> <span style="color:#008080">Row=</span><span style="color:#d14">&#34;0&#34;</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#008080">AppUserModelID=</span><span style="color:#d14">&#34;Microsoft.ZuneVideo_8wekyb3d8bbwe!Microsoft.ZuneVideo&#34;</span><span style="color:#000080">/&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#000080">&lt;/start:Group&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#000080">&lt;start:Group</span> <span style="color:#008080">Name=</span><span style="color:#d14">&#34;探索&#34;</span><span style="color:#000080">&gt;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#000080">&lt;start:Tile</span> <span style="color:#008080">Size=</span><span style="color:#d14">&#34;2x2&#34;</span> <span style="color:#008080">Column=</span><span style="color:#d14">&#34;4&#34;</span> <span style="color:#008080">Row=</span><span style="color:#d14">&#34;2&#34;</span> <span style="color:#008080">AppUserModelID=</span><span style="color:#d14">&#34;Microsoft.SkypeApp_kzf8qxf38zg5c!App&#34;</span><span style="color:#000080">/&gt;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#000080">&lt;start:Tile</span> <span style="color:#008080">Size=</span><span style="color:#d14">&#34;2x2&#34;</span> <span style="color:#008080">Column=</span><span style="color:#d14">&#34;2&#34;</span> <span style="color:#008080">Row=</span><span style="color:#d14">&#34;2&#34;</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#008080">AppUserModelID=</span><span style="color:#d14">&#34;Microsoft.MSPaint_8wekyb3d8bbwe!Microsoft.MSPaint&#34;</span><span style="color:#000080">/&gt;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#000080">&lt;start:Tile</span> <span style="color:#008080">Size=</span><span style="color:#d14">&#34;2x2&#34;</span> <span style="color:#008080">Column=</span><span style="color:#d14">&#34;0&#34;</span> <span style="color:#008080">Row=</span><span style="color:#d14">&#34;2&#34;</span> <span style="color:#008080">AppUserModelID=</span><span style="color:#d14">&#34;Microsoft.BingWeather_8wekyb3d8bbwe!App&#34;</span><span style="color:#000080">/&gt;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#000080">&lt;start:DesktopApplicationTile</span> <span style="color:#008080">Size=</span><span style="color:#d14">&#34;2x2&#34;</span> <span style="color:#008080">Column=</span><span style="color:#d14">&#34;4&#34;</span> <span style="color:#008080">Row=</span><span style="color:#d14">&#34;0&#34;</span> <span style="color:#008080">DesktopApplicationID=</span><span style="color:#d14">&#34;MSEdge&#34;</span><span style="color:#000080">/&gt;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#000080">&lt;start:Tile</span> <span style="color:#008080">Size=</span><span style="color:#d14">&#34;4x2&#34;</span> <span style="color:#008080">Column=</span><span style="color:#d14">&#34;0&#34;</span> <span style="color:#008080">Row=</span><span style="color:#d14">&#34;0&#34;</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#008080">AppUserModelID=</span><span style="color:#d14">&#34;Microsoft.WindowsStore_8wekyb3d8bbwe!App&#34;</span><span style="color:#000080">/&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#000080">&lt;/start:Group&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#000080">&lt;start:Group</span> <span style="color:#008080">Name=</span><span style="color:#d14">&#34;Carson&#34;</span><span style="color:#000080">&gt;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#998;font-style:italic">&lt;!-- 注意如果不是appID，前面用的是start:DesktopApplicationTile --&gt;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#000080">&lt;start:DesktopApplicationTile</span> <span style="color:#008080">Size=</span><span style="color:#d14">&#34;2x2&#34;</span> <span style="color:#008080">Column=</span><span style="color:#d14">&#34;0&#34;</span> <span style="color:#008080">Row=</span><span style="color:#d14">&#34;0&#34;</span>
+</span></span><span style="display:flex;"><span>                                                  <span style="color:#008080">DesktopApplicationLinkPath=</span><span style="color:#d14">&#34;%ProgramData%\Microsoft\Windows\Start Menu\Programs\dovego.lnk&#34;</span><span style="color:#000080">/&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#000080">&lt;/start:Group&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#000080">&lt;/defaultlayout:StartLayout&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000080">&lt;/StartLayoutCollection&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000080">&lt;/DefaultLayoutOverride&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000080">&lt;/LayoutModificationTemplate&gt;</span>
+</span></span></code></pre><p>修改完xml之後可以透過</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Import-StartLayout -LayoutPath my.xml -MountPath C:\ 建議用下面的命令</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Import-StartLayout -LayoutPath my.xml -MountPath $env:SystemDrive\<span style="color:#bbb">
+</span></span></span></code></pre><hr>
+<p>而這裡面的項目，都必須新增捷徑在開始的目錄之中，要新增捷徑</p>
+<p>就必須把它放在AppsFolder之中，要檢視AppsFolder的內容可以使用以下命令</p>
+<pre><code>win+R: 輸入: shell:AppsFolder
+</code></pre>
+<p>至於這個資料夾的內容怎麼新增，則是在以下目錄</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>shell:AppsFolder<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>start &#34;$env:APPDATA\Microsoft\Windows\Start Menu\Programs\&#34;<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 使用者</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>start &#34;$env:ProgramData\Microsoft\Windows\Start Menu\Programs\&#34;<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># LocalMachine</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>start &#34;$env:ProgramData\Microsoft\Windows\Start Menu\Programs\&lt;myFolder&gt;\&lt;my.lnk&gt;&#34;<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 如果沒有東西，可能是您直接把目錄複製過去之類的，嘗試把檔案重新命名之後再使用命名回來再用Get-StartApps就會看到東西</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 查找*dove*, *go-http*, *Example*的項目</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-StartApps | where { $_.Name -match &#39;(dove|go-http|Example)&#39; }<span style="color:#bbb">
+</span></span></span></code></pre><p>放完之後在重新檢視AppsFolder就會看到它有在裡面了，此外<code>Get-StartApps</code>也會列出來，你就可以看到AppID</p>
+<blockquote>
+<p>不過並非所有的項目都一定會在<code>Start Menu\Programs</code>中被找到，例如透過命令:</p>
+<blockquote>
+<p>Add-AppxPackage -Path &quot;C:...\test\AppxManifest.xml&quot; -Register</p>
+</blockquote>
+<p>他的exe檔案位置可以取決於AppxManifest.xml，所以不一定只能放在<code>Start Menu\Programs</code>之中。</p>
+<p>詳細的位置可以透過Get-AppxPackage找到，例如</p>
+<blockquote>
+<p>(Get-AppxPackage -Name &quot;MyPackage.Identity.Name&quot;).InstallLocation</p>
+</blockquote>
+</blockquote>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>Name   AppID<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#555">---</span>- <span style="color:#bbb">  </span>-----<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>dovego C:\...\go\1.16\bin\dovego.exe<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 如果你以此AppID去[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier(&#34;{{.AppID}}&#34;);</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 那麼他會在:</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 建立出目錄，而由於AppID有用\分開，所以他會一層一層的建立目錄，最後得到的位置是:</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\C:\...\go\1.16\bin\dovego.exe<span style="color:#bbb">
+</span></span></span></code></pre><h2 id="localgroupmember">LocalGroupMember</h2>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>Get-LocalGroup | ForEach-Object { Write-Host &#34;Group Name: $($_.Name)&#34;; Get-LocalGroupMember -Name &#34;$($_.Name)&#34;; }<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># $_ 是迴圈的變數, 如果要在字串中直接取得該變數的某個成員，不可以直接用$_.Name，要使用$($_.Name)</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-LocalGroupMember -Name Administrators<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 查看當前Administrators群組成員有哪些</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Add-LocalGroupMember -Group &#34;Administrators&#34; -Member $env:UserName<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 添加當前使用者成為Administrators成員</span><span style="color:#bbb">
+</span></span></span></code></pre><h2 id="env">env</h2>
+<p>列出所有env的項目</p>
+<pre><code>Get-ChildItem Env:
+</code></pre>
+<h2 id="appid">註冊AppID</h2>
+<p>這兩個都命令{<code>Get-AppxPackage</code>, <code>Add-AppxPackage</code>}都只在5.1支持</p>
+<p>AppID要成功有以下幾種方法都可以辦到</p>
+<ol>
+<li>
+<p>在<code>Start Menu\Programs</code>新增捷徑:</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>start &#34;$env:APPDATA\Microsoft\Windows\Start Menu\Programs\&#34;<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># User</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>start &#34;$env:ProgramData\Microsoft\Windows\Start Menu\Programs\&#34;<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># Machine</span><span style="color:#bbb">
+</span></span></span></code></pre><p>但是之後用<code>[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier(&quot;{{.AppID}}&quot;)</code>顯示訊息的時候，他會用捷徑的路徑寫到機碼去</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 建立出目錄，而由於AppID有用\分開，所以他會一層一層的建立目錄，最後得到的位置是:</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"> </span>\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\C:\...\go\1.16\bin\dovego.exe<span style="color:#bbb">
+</span></span></span></code></pre></li>
+<li>
+<p>使用Add-AppxPackage來註冊應用程式 (推薦用這個，最穩定)</p>
+<p>這項內容可能會涉及到:</p>
+<ul>
+<li><a href="https://learn.microsoft.com/en-us/uwp/schemas/appxpackage/how-to-create-a-basic-package-manifest">AppxManifest.xml</a></li>
+<li>憑證 (可選項)</li>
+</ul>
+<p>使用Add-AppxPackage的項目，可以不用在這兩個資料夾之中</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#d14">&#34;$env:APPDATA\Microsoft\Windows\Start Menu\Programs\&#34; # User
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">&#34;</span>$env:ProgramData\Microsoft\Windows\Start Menu\Programs\&#34;<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># Machine</span><span style="color:#bbb">
+</span></span></span></code></pre><p>大部份都是在:&quot;$env:ProgramFiles\WindowsApps&quot;之中</p>
+<p>但是也不限定，像我安裝我寫的App用的位置就是其他地方</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#bbb"> </span>Get-AppxPackage | ForEach-Object { if ($_.Name -match &#34;Example&#34;) { Write-Output &#34;Object info:`n&#34;; $_ | Format-List ; start $($_.InstallLocation); }}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"> </span>Name             ExampleApp<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"> </span>Publisher        CN=Example<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"> </span>Architecture     Neutral<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"> </span>ResourceId<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"> </span>Version          1.0.0.0<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"> </span>PackageFullName  ExampleApp_1.0.0.0_neutral__s2ne61n4j7kre<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"> </span>InstallLocation  C:\Users\...\src <span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># &lt;-- 在其他的路徑</span><span style="color:#bbb">
+</span></span></span></code></pre></li>
+</ol>
+<blockquote>
+<p>💡 不論是<code>建立捷徑</code>還是用<code>Add-AppxPackage</code>的方式，都可以在shell:AppsFolder的目錄中看到</p>
+</blockquote>
+<h3 id="add-appxpackagehttpslearnmicrosoftcomen-uspowershellmoduleappxadd-appxpackageviewwindowsserver2022-ps"><a href="https://learn.microsoft.com/en-us/powershell/module/appx/add-appxpackage?view=windowsserver2022-ps">Add-AppxPackage</a></h3>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># Add-AppxPackage -Path $ManifestPath -Register -DisableDevelopmentMode # 所謂的DisableDevelopmentMode是指，如果您當前是開發模式，那麼它就會把這個app disable，也就是在開發模式下禁用這個項目</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Add-AppxPackage -Path &#34;C:\...\test\AppxManifest.xml&#34; -Register<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 後面一定要加上Register，不然會遇到參數錯誤</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-AppxPackage -Name *Example*<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 就可以查找到PackageFullName</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-StartApps -Name  *Example* | Select-Object Name, AppID <span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 可以查看到AppID</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Remove-AppxPackage -Package &#34;PackageFullName&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Remove-AppxPackage -Package &#34;ExampleApp_1.0.0.0_neutral__s2ne61n4j7kre&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#998;font-style:italic"># \HKEY_USERS\S-1-5-21-3051027765-3782066248-1388807790-1001\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\Repository\Packages\ExampleApp_1.0.0.0_neutral__s2ne61n4j7kre</span><span style="color:#bbb">
+</span></span></span></code></pre><h3 id="heading">常用命令</h3>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>Get-StartApps<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-AppxPackage<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 這些的內容其實都保存在 %ProgramFiles%\WindowsApps\ 但是檔案總管不能直接瀏覽，可以用系統管理員dir $env:ProgramFiles\WindowsApps\</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>dir &#34;$env:ProgramFiles\WindowsApps\&#34; | foreach { if($_.Name -match &#39;Example&#39;) {$_} }<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>dir &#34;$env:ProgramFiles\WindowsApps\&#34; | foreach { if($_.Name -match &#39;(AppUp|Notepad)&#39;) {$_} }<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>dir &#34;$env:ProgramFiles\WindowsApps\&#34; | foreach { if($_.Name -match &#39;(s2ne61n4j7kre)&#39;) {$_} }<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># ExampleApp_s2ne61n4j7kre!ExampleApp</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>start &#34;$env:ProgramFiles\WindowsApps\AppUp.IntelGraphicsExperience_1.100.4779.0_neutral_split.language-zh-hant_8j3eq9eme6ctt&#34;<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 在上面查到之後就可以開啟</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>echo &#34;$env:ProgramFiles\WindowsApps\&#34;<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 會沒有權限瀏覽</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>echo &#34;$env:APPDATA\Microsoft\Windows\Start Menu\Programs&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>echo &#34;$env:ProgramData\Microsoft\Windows\Start Menu\Programs&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># Add-AppxPackage -Path &#34;C:\...\out\MyApp.appx&#34; # 這個一直試不成功</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Add-AppxPackage -Path &#34;C:\...src\AppxManifest.xml&#34; -Register<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 這個一定可以成功！ 後面一定要加上Register，不然會遇到參數錯誤</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-AppxPackage | ForEach-Object { if ($_.Name -eq &#34;Microsoft.WindowsCalculator&#34;) { Write-Output &#34;Object info:`n&#34;; $_ | Format-List ; Write-Output &#34;InstallLocation:`n$($_.InstallLocation)&#34;; }}<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 小算盤</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-AppxPackage | ForEach-Object { if ($_.Name -match &#34;LinkedInforWindows&#34;) { Write-Output &#34;Object info:`n&#34;; $_ | Format-List ; Write-Output &#34;InstallLocation:`n$($_.InstallLocation)&#34;; }}<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># LinkedInforWindows</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-AppxPackage | ForEach-Object { if ($_.Name -match &#34;Example&#34;) { Write-Output &#34;Object info:`n&#34;; $_ | Format-List ; Write-Output &#34;InstallLocation:`n$($_.InstallLocation)&#34;; }}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-AppxPackage | ForEach-Object { if ($_.Name -match &#34;Example&#34;) { Write-Output &#34;Object info:`n&#34;; $_ | Format-List ; start $($_.InstallLocation); }}<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 開啟安裝的目錄</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-AppxPackage | ForEach-Object { if ($_.Name -match &#34;AppUp.IntelGraphicsExperience&#34;) { Write-Output &#34;Object info:`n&#34;; $_ | Format-List ; start $($_.InstallLocation); }}<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 開啟安裝的目錄</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 查看VisualElements</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$appx = Get-AppxPackage -Name Microsoft.WindowsCalculator<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$manifest = (Get-AppxPackageManifest $appx).Package<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$manifest.Applications.Application.VisualElements<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 查看AppID</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-StartApps -Name &#34;小算盤&#34; | Select-Object Name, AppID<span style="color:#bbb">
+</span></span></span></code></pre><h3 id="heading-1">憑證相關</h3>
+<table>
+<thead>
+<tr>
+<th>執行檔名稱</th>
+<th>位置</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>makeAppx</td>
+<td>echo &quot;$env:ProgramFiles (x86)\Windows Kits\10\bin\10.0.17763.0\x64\makeappx.exe&quot;</td>
+<td>產生出appx的檔案</td>
+</tr>
+<tr>
+<td>makeCert</td>
+<td>echo &quot;$env:ProgramFiles (x86)\Windows Kits\10\bin\10.0.17763.0\x64\makecert.exe&quot;</td>
+<td>可以被<code>New-SelfSignedCertificate</code>指令取代</td>
+</tr>
+<tr>
+<td>mmc.exe</td>
+<td></td>
+<td>開啟主控台，可以匯入多種畫面，包含憑證(如果要檢視Local的內容就要靠它)</td>
+</tr>
+<tr>
+<td>certmgr.msc</td>
+<td></td>
+<td>檢視<code>User</code>的憑證</td>
+</tr>
+</tbody>
+</table>
+<p>makeAppx</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>cd C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\makeappx.exe<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 10.0.17763.0是您的版本號碼，如果沒有要去載windows SDK就會有了</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>makeappx pack /d . /p MyApp.appx<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>./makeappx pack /d &#34;C:\...\src&#34; /p &#34;C:\...\out\MyApp.appx&#34;<span style="color:#bbb">
+</span></span></span></code></pre><pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 列出所有憑證內容</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-ChildItem cert:\CurrentUser<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 會跑出以下資訊，就代表CurrentUser底下還有這些的目錄</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Name TrustedPublisher<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Name ClientAuthIssuer<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Name Root<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 受信任的跟憑證授權單位</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Name UserDS<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Name CA<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 中繼憑證授權單位</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Name REQUEST<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Name AuthRoot<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Name TrustedPeople<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Name ADDRESSBOOK<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Name Local NonRemovable Certificates<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Name My<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Name SmartCardRoot<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Name Trust<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Name Disallowed<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 找尋名稱</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-ChildItem -Path cert:\CurrentUser -Recurse | Where-Object {$_.Subject -eq &#34;CN=MyApp Test Certificate&#34;}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 如果你有需要刪除，找到他之後再使用Remove-Item去刪除</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-ChildItem -Path cert:\CurrentUser -Recurse | Where-Object {$_.Subject -eq &#34;CN=MyApp Test Certificate&#34;} | foreach { Remove-Item -Path $_.PSPath }<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-ChildItem -Path cert:\LocalMachine -Recurse | Where-Object {$_.Subject -eq &#34;CN=MyApp Test Certificate&#34;} | foreach { Remove-Item -Path $_.PSPath }<span style="color:#bbb">
+</span></span></span></code></pre><p>mmc.exe
+certmgr.msc</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>certmgr.msc<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 這個只能顯示CurrentUser</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>mmc.exe<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># Local Computer. 開啟後是一個空白的介面，在檔案 &gt; 嵌入式管理單元 &gt; 選擇憑證 &gt; Local Computer &gt; 匯入</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-ChildItem -Path cert:\<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 輸出</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># Location   : CurrentUser</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># StoreNames : {TrustedPublisher, ClientAuthIssuer, Root, UserDS...}</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># Location   : LocalMachine</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># StoreNames : {TestSignRoot, ClientAuthIssuer, m, Root...}</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\makecert.exe<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 不需要makecert.exe  可以靠New-SelfSignedCertificate來完成</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>cd C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>./makecert -r -pe -n &#34;CN=MyApp Test Certificate&#34; -b 01/01/2023 -e 01/01/2026 -ss my<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># CN為憑證的名稱 產生一個區間為(begin, end): 2023~2026年, 存放在: cert:\CurrentUser\My底下</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 如果你建立錯誤，不是建立在my(my是一個關鍵字，表示個人)，那麼可以用certMgr.msc的搜尋，用名稱去搜，找到之後再把它刪除即可</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>./makecert -r -pe -n &#34;CN=MyApp Test Certificate&#34; -b 01/01/2023 -e 01/01/2026 -sky exchange -ss my <span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 添加 &#34;-sky exchange&#34; 參數，以確保憑證包含可以用於程式碼簽署的私鑰</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>./makecert -r -pe -n &#34;CN=MyApp Test Certificate&#34; -b 01/01/2023 -e 01/01/2026 -sky exchange -ss my -a sha256<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 指定演算法為sha256, 不然預設的是sha1</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>./makecert -r -pe -n &#34;CN=MyApp Test Certificate&#34; -b 01/01/2023 -e 01/01/2026 -sky exchange -a sha256 -eku 1.3.6.1.5.5.7.3.3 -ss my<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># -eku 1.3.6.1.5.5.7.3.3表示要加上 Code Signing 的擴展屬性</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$cert = New-SelfSignedCertificate -DnsName &#34;CN=MyApp Test Certificate&#34; -CertStoreLocation cert:\CurrentUser\My -KeySpec Signature -KeyUsage DigitalSignature -FriendlyName &#34;MyApp Test Certificate&#34; -NotBefore (Get-Date).Date -NotAfter (Get-Date).Date.AddDays(365) -HashAlgorithm SHA256 -KeyExportPolicy Exportable -TextExtension @(&#34;2.5.29.37={text}1.3.6.1.5.5.7.3.3&#34;)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-ChildItem cert:\CurrentUser\My<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 上面的弄完之後，打開certMgr.msc =&gt; 個人 =&gt; 憑證 也可以查看到我們所簽屬的憑證</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 要刪除憑證，可以用certMgr.msc的UI介面刪除即可</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 完成之後還是會有問題，查看憑證會看到警告: 這個CA根憑證不受信任因為它不是位於受信任的根憑證授權單位存放區中</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$cert = Get-ChildItem -Path cert:\CurrentUser\My -Recurse | Where-Object {$_.Subject -eq &#34;CN=MyApp Test Certificate&#34;}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Export-Certificate -Type CERT -Cert $cert -FilePath &#34;C:\MyCert.cer&#34;<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 匯出憑證 (需要管理員權限)</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 接著點擊右鍵 &gt; 安裝憑證 &gt; 目前使用者 &gt; 將所有憑證放入以下的存放區 &gt; 選擇: 受信任的根憑證授權單位</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 或者是直接用certMgr.msc從個人.憑證資料夾中選擇該項目，把它移到 「受信任的根憑證授權單位.憑證目錄」 之中也可以</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 不可以直接在一開始就安裝在</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># New-SelfSignedCertificate -DnsName &#34;CN=MyApp Test Certificate&#34; -CertStoreLocation cert:\CurrentUser\TrustedPublisher -KeySpec Signature -KeyUsage DigitalSignature -FriendlyName &#34;MyApp Test Certificate&#34; -NotBefore (Get-Date).Date -NotAfter (Get-Date).Date.AddDays(365) -HashAlgorithm SHA256 -KeyExportPolicy Exportable -TextExtension @(&#34;2.5.29.37={text}1.3.6.1.5.5.7.3.3&#34;)</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#998;font-style:italic"># 可以安裝到My之後在寫入到Root，就不需要透過UI. 但還是會出現警告視窗(沒辦法避免)</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$cert = New-SelfSignedCertificate -DnsName &#34;CN=MyApp Test Certificate&#34; -CertStoreLocation cert:\LocalMachine\My -KeySpec Signature -KeyUsage DigitalSignature -FriendlyName &#34;MyApp Test Certificate&#34; -NotBefore (Get-Date).Date -NotAfter (Get-Date).Date.AddDays(365) -HashAlgorithm SHA256 -KeyExportPolicy Exportable -TextExtension @(&#34;2.5.29.37={text}1.3.6.1.5.5.7.3.3&#34;)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-ChildItem -Path Cert:\LocalMachine\My -CodeSigningCert<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 只顯示所有CodeSigningCert的項目</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># $store = New-Object System.Security.Cryptography.X509Certificates.X509Store -ArgumentList &#34;TrustedPublisher&#34;, &#34;LocalMachine&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$store = New-Object System.Security.Cryptography.X509Certificates.X509Store -ArgumentList &#34;Root&#34;, &#34;LocalMachine&#34;<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># Root才是「受信任的**根**憑證授權單位」</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$store.Add($cert)<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 在將憑證新增至憑證存放區時，如果該憑證的發行者（Issuer）不在受信任的憑證授權單位存放區中，系統會發出安全警告。因此，即使透過程式碼進行新增，仍然會出現安全警告。 這個警告主要是要提醒使用者注意憑證的發行者是否可信，若確定憑證是可信的，可以選擇信任該憑證並新增至存放區中，才能正確地使用該憑證。</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#000080">$store.Close() # 安裝在Root之後，除了Root，在CA</span>:<span style="color:#bbb"> </span>中繼憑證授權單位 也會出現<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># Remove-Item -Path cert:\LocalMachine\My\$($cert.Thumbprint) # 移除也可以直接透過指紋來移除</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Remove-Item -Path $cert.PSPath<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 以上方法雖然可行，但前面捕的位置有點饒口，覺得用$cert.PSPath會比較清楚</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-ChildItem -Path cert:\LocalMachine\My<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 輸出</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Thumbprint                                Subject<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#555">---</span>------- <span style="color:#bbb">                               </span>-------<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>37E7789F6FD45B573705CD9DB4D8D72C5AE5E8A7  CN=1F906F59-B093-4E7E-8564-5D8E5548A460<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 原本舊有的項目</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>852FDDC5739C2D7C55B01D0B5D16B9D9BFA67BF0  CN=MyApp Test Certificate<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 我們所建立的憑證</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 接著要確保我們的憑證可以被用來簽屬程式碼，不然會遇到錯誤：「Set-AuthenticodeSignature : 無法簽署程式碼。指定的憑證不適合程式碼簽署。」</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$cert = Get-ChildItem -Path cert:\CurrentUser\My<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$cert2 = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($cert)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># $cert2.Extensions.Find(&#34;2.5.29.37&#34;) # 沒有Find的方法</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$cert.Extensions<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 總之這邊是確認. 一開始如果您有在New-SelfSignedCertificate有加上-eku 1.3.6.1.5.5.7.3.3就會是CodeSigningCert，表示此憑證可以用來代碼簽署</span><span style="color:#bbb">
+</span></span></span></code></pre><h4 id="heading-2">如何刪除憑證</h4>
+<p>以下為刪除憑證的方法，有待檢驗:</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 載入憑證</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$store = New-Object System.Security.Cryptography.X509Certificates.X509Store -ArgumentList &#34;My&#34;, CurrentUser<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 找到要移除的憑證</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$thumbprint = &#34;XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$cert = $store.Certificates.Find([System.Security.Cryptography.X509Certificates.X509FindType]::FindByThumbprint, $thumbprint, $false)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 如果找到要移除的憑證就移除</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>if ($cert.Count -gt 0) {<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$store.Remove($cert[0])<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 關閉憑證</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>$store.Close()<span style="color:#bbb">
+</span></span></span></code></pre><p>其實不需要上面的指令那麼麻煩，透過以下的指令就能辦到</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>Get-ChildItem -Path cert:\CurrentUser -Recurse | Where-Object {$_.Subject -eq &#34;CN=MyApp Test Certificate&#34;} | foreach {Remove-Item -Path $_.PSPath }<span style="color:#bbb">
+</span></span></span></code></pre><h4 id="appx-"><del>簽署Appx</del> (沒有試成功過)</h4>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 簽署appx</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#998;font-style:italic"># 注意請先用: Get-ChildItem cert:\CurrentUser\My 確定有幾個，如果只有一個可以直接用，如果有多個要改成(Get-ChildItem cert:\CurrentUser\My)[n] n為第幾個的下標值</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Set-AuthenticodeSignature -FilePath &#34;C:\...\out\MyApp.appx&#34; -Certificate (Get-ChildItem cert:\CurrentUser\My)[1] -CodeSigningCert<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 如果出現「找不到符合參數名稱 &#39;CodeSigningCert&#39; 的參數。」的錯誤，請確認有在New-SelfSignedCertificate有加上-eku 1.3.6.1.5.5.7.3.3就會是CodeSigningCert，表示此憑證可以用來代碼簽署</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># $cert = (Get-ChildItem cert:\CurrentUser\My)[1] # 不能用My, My的內容不被信任</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-ChildItem -Path cert:\CurrentUser -Recurse | Where-Object {$_.Subject -eq &#34;CN=MyApp Test Certificate&#34;} | foreach { echo $_.PSPath }<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 找出Root的PSPath</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$cert = Get-ChildItem -Path &#34;Microsoft.PowerShell.Security\Certificate::CurrentUser\Root\4ABEFB58180FBE1A82F0048956A5C828A214755F&#34;<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 後面就放PSPath的路徑名稱</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Set-AuthenticodeSignature -FilePath &#34;C:\...\out\MyApp.appx&#34; -Certificate $cert -HashAlgorithm &#34;SHA256&#34; -TimestampServer &#34;http://timestamp.digicert.com&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Set-AuthenticodeSignature -FilePath &#34;C:\...\out\MyApp.appx&#34; -Certificate (Get-ChildItem cert:\CurrentUser\My)[1] -HashAlgorithm &#34;SHA256&#34; -TimestampServer &#34;http://timestamp.digicert.com&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Set-AuthenticodeSignature -FilePath &#34;C:\...\out\MyApp.appx&#34; -Certificate (Get-ChildItem cert:\CurrentUser\TrustedPublisher) -HashAlgorithm &#34;SHA256&#34; -TimestampServer &#34;http://timestamp.digicert.com&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 確認有沒有被簽屬成功</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-AuthenticodeSignature -FilePath &#34;C:\...\out\MyApp.appx&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Add-AppxPackage -Path &#34;C:\...\out\MyApp.appx&#34;<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 預設似乎是都裝在LocalMachine，所以如果失敗不仿試試看換到LocalMachine</span><span style="color:#bbb">
+</span></span></span></code></pre><h2 id="heading-3">新增一個項目到「新增或移除程式」中</h2>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>$RegPath = &#34;HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\MyTestApp123&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$AppName = &#34;MyTestApp123&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$AppVersion = &#34;1.0.0&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$Publisher = &#34;My Company&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$UninstallString = &#34;C:\Program Files\MyTestApp123\Uninstall.exe&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$InstallLocation = &#34;C:\Program Files\MyTestApp123&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>New-Item -Path $RegPath -Force | Out-Null<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>New-ItemProperty -Path $RegPath -Name &#34;DisplayName&#34; -Value $AppName -PropertyType &#34;String&#34; -Force | Out-Null<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>New-ItemProperty -Path $RegPath -Name &#34;DisplayVersion&#34; -Value $AppVersion -PropertyType &#34;String&#34; -Force | Out-Null<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>New-ItemProperty -Path $RegPath -Name &#34;Publisher&#34; -Value $Publisher -PropertyType &#34;String&#34; -Force | Out-Null<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>New-ItemProperty -Path $RegPath -Name &#34;UninstallString&#34; -Value $UninstallString -PropertyType &#34;String&#34; -Force | Out-Null<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>New-ItemProperty -Path $RegPath -Name &#34;InstallLocation&#34; -Value $InstallLocation -PropertyType &#34;String&#34; -Force | Out-Null<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>New-ItemProperty -Path $RegPath -Name &#34;EstimatedSize&#34; -Value 12345 -PropertyType &#34;DWord&#34;<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 用的是byte, 所以12345相當於12.1MB左右</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#998;font-style:italic"># New-ItemProperty -Path $RegPath -Name &#34;Size&#34; -Value &#34;12&#34; # 寫Size沒有用，不論有沒有加MB都沒用，正確的是寫EstimatedSize才可以在新增/移除的該項目中看到內容</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#998;font-style:italic"># Set-ItemProperty -Path $RegPath -Name &#34;Size&#34; -Value &#34;12 MB&#34; # 如果要修改可以用Set-ItemProperty</span><span style="color:#bbb">
+</span></span></span></code></pre><h2 id="shellnotifyicon">ShellNotifyIcon殘留</h2>
+<ol>
+<li>HKEY_CURRENT_USER\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\TrayNotify</li>
+<li>(備份整個TrayNotify資料夾，以防萬一)</li>
+<li>刪除IconStreams, PastIconsStream兩個機碼數值</li>
+<li>開啟工作管理員(taskmgr.exe)，刪除所有explorer.exe的項目</li>
+<li>再次執行explorer.exe</li>
+</ol>
+<h2 id="foreach">Foreach參考</h2>
+<pre><code>foreach ($list in @((1..10), (11..20)) ) { foreach ($j in $list) { echo $j } }
+@((1..10), (11..20)) | foreach { $_.GetType(); $_ | foreach { echo $_ } }
+$list = @((1..10), (11..20)); $list | foreach { $item = $_; $item.GetType()  }
+$list = @((1..10), (11..20)); $list | foreach { $item = $_; $item | foreach { $_.GetType() }  }
+@((1..10), (11..20)) | foreach { $_ | foreach { echo $_ } }
+</code></pre>
+<h2 id="powershell51">Powershell5.1的注意事項</h2>
+<h3 id="heading-4">註解</h3>
+<p>如果您是用powershell5.1去開發，有可能會因為註解而影響到，因為他的編碼不是UTF8，您可以在註解的最後面加上「<code>;</code>」應該就可以執行了</p>
+<h3 id="supportsshouldprocess">SupportsShouldProcess</h3>
+<p>有一些指令會缺少，例如Start-Process在5.1就沒有Confirm的選項，所以如果要兼容，可能程式碼要做判斷</p>
+<h2 id="heading-5">參考資料</h2>
+<ul>
+<li><a href="https://discord.com/channels/180528040881815552/">discord powershell社群</a></li>
+<li>黑暗執行緒
+<ul>
+<li><a href="https://blog.darkthread.net/blog/powershell-learning-notes/">Powershell 學習筆記</a></li>
+<li><a href="https://blog.darkthread.net/blog/test-webapi-without-tool/">GET/POST參考</a>: <code>Invoke-WebRequest</code></li>
+</ul>
+</li>
+<li><a href="https://books.goalkicker.com/PowerShellBook/">PowershellBook</a></li>
+<li><a href="https://ccmcache.wordpress.com/2017/10/15/use-powershell-to-dynamically-manage-windows-10-start-menu-layout-xml-files/">Use PowerShell to Dynamically Manage Windows 10 Start Menu Layout XML Files</a></li>
+</ul>
+ 
+
+</body>
+
+<footer class="fixed-bottom">
+</footer>
+</html>
+
+

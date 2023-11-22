@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="source-hash" content="87ba572ca295c51e8db506a5b3e5405a" >
+    <meta charset="utf-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="icon" sizes="any" type="image/svg+xml" href="/static/img/favicon.svg">
+<title>itunes</title> 
+<link rel="stylesheet" href="/static/css/styles.css">
+
+  <script src="/static/js/clipboard/copy-pre.js"></script>
+
+    <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"> 
+      <script src="/static/js/pkg/d3.js"></script> 
+      <script src="/static/js/pkg/markmap-view.js"></script>
+      <script type="module"
+              src="/static/js/uml/toc_markmap.js"></script> 
+      <script defer src="/static/js/pkg/webfontloader.js"></script> 
+    </head>
+
+<script type="module" src="/static/js/bs/components/navbar.js"></script>
+
+<link rel="icon" sizes="any" type="image/svg+xml" href="/static/img/favicon.svg">
+<nav class="navbar fixed-top" style="background-image: url('/static/img/bg/orange.svg')">
+  <a href="/index.html"><img src="/static/img/favicon.svg" class="logo" alt="logo" width="48" height="48"/></a>
+  <ul>
+    <li><a href="/">HOME</a></li>
+    <li><a href="/blog/">Blog</a></li>
+    <li class="dropdown">
+      <span>Tutorial</span>
+      <ul class="dropdown-menu">
+        <li><a href="/tutorial/svg/">SVG</a></li>
+      </ul>
+    </li>
+  </ul>
+  <br>
+</nav>
+<body class="container">
+<div class="mt-6"></div>
+<small class="text-muted">最後建立日期: 2023-11-22</small>
+
+<h1 id="iphone">iphone作業系統更新</h1>
+<h2 id="heading">關閉自動備份</h2>
+<ol>
+<li>
+<p>查找itunes.exe的位置: 打開powershell，輸入</p>
+<blockquote>
+<p>gcm itunes.exe</p>
+</blockquote>
+</li>
+<li>
+<p>關閉自動備份:
+這邊的範例假設位於ProgramFiles下，可自行替換成您的iTunes.exe路徑</p>
+<pre><code>%ProgramFiles%\iTunes\iTunes.exe /setPrefInt DeviceBackupsDisabled 1
+</code></pre>
+<p>如果要再開啟備份，把後面的1改成0即可。</p>
+<p>正常輸入完畢之後沒有任何訊息，以不會啟動iTunes</p>
+</li>
+</ol>
+<h2 id="itunes4000">iTunes未知錯誤4000</h2>
+<p>如果您發現更新itunes的時候，它會要求你輸入密碼，然後輸入完畢之後itunes又自動關閉，您要再次點擊啟動</p>
+<p>或者遇到未知錯誤4000時，就可以考慮「<code>停用解鎖密碼</code>」，停用的方法如下</p>
+<pre><code>設定 -&gt; FaceID與密碼/TochID與密碼 -&gt; 關閉密碼
+</code></pre>
+<p>等更新完畢之後再啟用即可(指紋可能要重壓)</p>
+<h2 id="ituneshttpsapplestackexchangecoma49406403361">itunes<a href="https://apple.stackexchange.com/a/49406/403361">下載檔案的位置</a></h2>
+<p>更新檔通常都好幾GB，而且也不會自動砍掉，有需要了話要自己去以下位子刪除</p>
+<blockquote>
+<p>%userprofile%\AppData\Local\Packages\AppleInc.iTunes_nzyj5cx40ttqa\LocalCache\Roaming\Apple Computer\iTunes\iPhone Software Updates</p>
+</blockquote>
+</body>
+
+<footer class="fixed-bottom">
+</footer>
+</html>

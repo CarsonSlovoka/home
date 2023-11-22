@@ -1,0 +1,222 @@
+<!-- 參考出處: https://codepen.io/perry_nt/pen/eVboze -->
+
+<style>
+  /* ~~~~~~~ INIT. BTN ~~~~~~~ */
+  .btn {
+    position: relative;
+    padding: 1.4rem 4.2rem; /* 上,右,下,左. 當只有上右，則下與上相同;左與右相同 */
+    padding-right: 3.1rem;
+    font-size: 1.4rem;
+    color: var(--color-default);
+    letter-spacing: 1.1rem; /* 字母間的間距 */
+    text-transform: uppercase; /* 將文本全部設定為大寫 */
+    transition: all 500ms cubic-bezier(0.77, 0, 0.175, 1); /* 動畫效果設定, 其中用all很省事，不管什麼屬性都會套用 */
+    cursor: pointer; /* hover後的鼠標外觀 */
+    user-select: none; /* 該文本無法被反白 */
+  }
+
+  .btn:before, .btn:after {
+    content: ''; /* 注意一定要給，否則特效無法出來 */
+    position: absolute; /* 偽元素的位子採用相對位子(通常該物件我們設定為relative，其偽元素就設定為absolute */
+    transition: inherit; /* 動畫效果繼承至父物件，也就是同: all 500ms cubic-bezier(0.77, 0, 0.175, 1) */
+    z-index: -1; /* 當元素重疊時，z-index較大的會覆蓋掉較小的元素。由於我們的邊框都是靠偽元素(before, after)生成，我們不想要讓偽元素的背景顏色填充掉全部(即主題文字) */
+  }
+
+  .btn:hover {
+    /*
+      這邊很單純，純粹就是設定該物件hover之後的前景色而已
+      值得一提的是，通常我們抓的時間會比背景顏色要來得晚，
+      也就是假設背景顏色在2s之後才全部完成，那我們這邊的時間就要壓在2s之後才會比較好看
+    */
+    color: var(--color-on-hover);
+    transition-delay: 2.5s;
+  }
+
+  .btn:hover:before {
+    /* 我們想做的就是運用pseudo來幫我們打造效果，
+      會有before還after，通常會把before當作開始, after當作結束
+      一般而言before開始我們會直接呈現開始的內容，所以不需要任何動畫來延緩呈現，因此會設定為0
+      但為了方便認知，我們設定為1.2s
+     */
+    transition-delay: 1.2s; /* 0s */
+  }
+
+  .btn:hover:after {
+    /* 設定最終要達到效果 */
+    background: var(--color-default);
+    transition-delay: 2.0s; /* .35s */
+  }
+
+  /* 以下的Top Right Bottom Left 都是處理兩條邊框線而已  */
+
+  /* From Top: 效果為沒有上下兩條邊框線而左右兩條邊框線從下到上畫起 */
+  .from-top:before,
+  .from-top:after {
+    left: 0; /* 邊框的開始位置為最左邊畫起 */
+    height: 0; /* 邊框高為0，所以不會看到邊框 */
+    width: 100%; /* 左右兩條邊線彼此的距離 */
+  }
+
+  .from-top:hover:before,
+  .from-top:hover:after {
+    height: 100%; /* 在hover之後調整為高度，就能馬上看到邊框線了 */
+  }
+
+  .from-top:before {
+    bottom: 0; /* 從底部開始 */
+    border: 1px solid #ff0000;
+
+    /* 無上下邊框線 */
+    border-top: 0;
+    border-bottom: 0;
+  }
+
+  .from-top:after {
+    /* 這個其實是針對 .btn:hover:after 所設定，btn:hover只有說背景顏色要改，但並沒有說明位置之間的關係為何 */
+    top: 40%; /* 正確應該是設定為0，為了明白刻意設定成其他數值 */
+    height: 200px; /* 正確應該是設定為0，為了明白刻意設定成其他數值 */
+  }
+
+  /* From Left */
+
+  .from-left:before,
+  .from-left:after {
+    top: 0; /* hover之後您的背景框的頂點開始位置從0開始 */
+    height: 100%;
+    width: 0;
+  }
+
+  .from-left:before {
+    right: 0; /* 從最右邊開始畫起 */
+    border: 1px solid var(--color-default);
+    border-left: 0; /* 不要左邊線 */
+    border-right: 0; /* 不要右邊線 */
+  }
+
+  .from-left:after {
+    left: 0;
+  }
+
+  .from-left:hover:before,
+  .from-left:hover:after {
+    width: 100%;
+  }
+
+  /* From Right */
+
+  .from-right:before,
+  .from-right:after {
+    top: 0;
+    width: 0;
+    height: 100%;
+  }
+
+  .from-right:before {
+    left: 0;
+    border: 1px solid var(--color-default);
+    border-left: 0;
+    border-right: 0;
+  }
+
+  .from-right:after {
+    right: 0;
+  }
+
+  .from-right:hover:before,
+  .from-right:hover:after {
+    width: 100%;
+  }
+
+  /* From center */
+
+  .from-center:before {
+    top: 0;
+    left: 50%;
+    height: 100%;
+    width: 0;
+    border: 1px solid var(--color-default);
+    border-left: 0;
+    border-right: 0;
+  }
+
+  .from-center:after {
+    bottom: 0;
+    left: 0;
+    height: 0;
+    width: 100%;
+    background: var(--color-default);
+  }
+
+  .from-center:hover:before {
+    left: 0;
+    width: 100%;
+  }
+
+  .from-center:hover:after {
+    top: 0;
+    height: 100%;
+  }
+
+  /* From Bottom */
+
+  .from-bottom:before,
+  .from-bottom:after {
+    left: 0;
+    height: 0;
+    width: 100%;
+  }
+
+  .from-bottom:before {
+    top: 0;
+    border: 1px solid var(--color-default);
+    border-top: 0;
+    border-bottom: 0;
+  }
+
+  .from-bottom:after {
+    bottom: 0;
+    height: 0;
+  }
+
+  .from-bottom:hover:before,
+  .from-bottom:hover:after {
+    height: 100%;
+  }
+
+  /* ~~~~~~~~~~~~ GLOBAL SETTINGS ~~~~~~~~~~~~ */
+
+  *, *:before, *:after {
+    box-sizing: border-box;
+  }
+
+  body {
+    --color-on-hover: #96B7C4;
+    --color-default: #dc1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    background-image: linear-gradient(-25deg, #cc6f6f 0%, #cfe31b 100%);
+  }
+
+  html {
+    font-size: 12px;
+    font-family: 'Playfair Display', serif;
+  }
+
+  div {
+    margin-bottom: 3rem;
+  }
+
+  div:last-child {
+    margin-bottom: 0;
+  }
+</style>
+
+<div class="btn from-top">From Top</div>
+<div class="btn from-left">From Left</div>
+<div class="btn from-right">From Right</div>
+<div class="btn from-center">From Center</div>
+<div class="btn from-bottom">From Bottom</div>

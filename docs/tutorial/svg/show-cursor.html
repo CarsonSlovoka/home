@@ -1,0 +1,25 @@
+<svg style="margin-left:30%; width:30%; border: 1px dashed blue">
+  <text x="30" y="30">click me</text>
+  <circle id="mouseCursor" cx="0" cy="0" r="4" fill="#00ff00" visibility="hidden"></circle>
+</svg>
+<script>
+  const svg = document.querySelector(`svg`)
+
+  svg.onclick = (e) => {
+    const domPoint = new DOMPointReadOnly(e.clientX, e.clientY)
+    const pt = domPoint.matrixTransform(svg.getScreenCTM().inverse())
+    const frag = document.createRange().createContextualFragment(`<circle cx="${pt.x}" cy="${pt.y}" r="2"></circle>`)
+    svg.append(frag)
+    svg.innerHTML = svg.innerHTML
+  }
+
+  // Below is for showing the cursor.
+  svg.onmousemove = (e) => {
+    const pt = new DOMPointReadOnly(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse())
+    const circleMouse = svg.querySelector(`#mouseCursor`)
+    circleMouse.setAttribute("cx", `${pt.x}`)
+    circleMouse.setAttribute("cy", `${pt.y}`)
+  }
+  svg.onmouseover = () => svg.querySelector(`#mouseCursor`).setAttribute("visibility", "visible")
+  svg.onmouseout = () => svg.querySelector(`#mouseCursor`).setAttribute("visibility", "hidden")
+</script>

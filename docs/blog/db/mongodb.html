@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="source-hash" content="80748403cef7683da795ee5db12bdda9" >
+    <meta charset="utf-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="icon" sizes="any" type="image/svg+xml" href="/static/img/favicon.svg">
+<title>mongoDB</title> 
+<link rel="stylesheet" href="/static/css/styles.css">
+
+  <script src="/static/js/clipboard/copy-pre.js"></script>
+
+    <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"> 
+      <script src="/static/js/pkg/d3.js"></script> 
+      <script src="/static/js/pkg/markmap-view.js"></script>
+      <script type="module"
+              src="/static/js/uml/toc_markmap.js"></script> 
+      <script defer src="/static/js/pkg/webfontloader.js"></script> 
+    </head>
+
+<script type="module" src="/static/js/bs/components/navbar.js"></script>
+
+<link rel="icon" sizes="any" type="image/svg+xml" href="/static/img/favicon.svg">
+<nav class="navbar fixed-top" style="background-image: url('/static/img/bg/orange.svg')">
+  <a href="/index.html"><img src="/static/img/favicon.svg" class="logo" alt="logo" width="48" height="48"/></a>
+  <ul>
+    <li><a href="/">HOME</a></li>
+    <li><a href="/blog/">Blog</a></li>
+    <li class="dropdown">
+      <span>Tutorial</span>
+      <ul class="dropdown-menu">
+        <li><a href="/tutorial/svg/">SVG</a></li>
+      </ul>
+    </li>
+  </ul>
+  <br>
+</nav>
+<body class="container">
+<div class="mt-6"></div>
+<small class="text-muted">最後建立日期: 2023-11-22</small>
+
+<h1 id="mongodb">MongoDB</h1>
+<h2 id="install">Install</h2>
+<p>需要安裝:</p>
+<ul>
+<li>mongoD.exe: server運行環境</li>
+<li>mongosh.exe: shell環境</li>
+<li>mongodb-Compass.exe (可選): 這個提供良好的可視化結果，建議可以啟動<code>mongodb\bin\Install-Compass.ps1</code>(powershell)來安裝它</li>
+</ul>
+<h3 id="mongod">mongoD安裝</h3>
+<p>至官網</p>
+<blockquote>
+<p><a href="https://www.mongodb.com">https://www.mongodb.com</a></p>
+</blockquote>
+<p>在上方的頁籤找尋</p>
+<pre><code>Products -&gt; Community Edtion -&gt; Community Server
+</code></pre>
+<p>之後會來到此頁面</p>
+<blockquote>
+<p><a href="https://www.mongodb.com/try/download/community">https://www.mongodb.com/try/download/community</a></p>
+</blockquote>
+<p>選擇<code>MongoDB Community Server</code></p>
+<p>在右方會有下拉選單，選擇您想要下載的版本以及平台</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#000080">Version</span>:<span style="color:#bbb"> </span><span style="color:#099">7.0.2</span><span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 593MB</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#000080">Platform</span>:<span style="color:#bbb"> </span>Windows x64<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#000080">Package</span>:<span style="color:#bbb"> </span>zip (不需要選msi)<span style="color:#bbb">
+</span></span></span></code></pre><p>下載完之後解壓，放到ProgramFile去</p>
+<p>把裡面的bin資料夾加入到環境變數</p>
+<ul>
+<li>mongod: database server</li>
+</ul>
+<p>如果您選擇的是6.0以上的版本，<a href="https://www.mongodb.com/docs/manual/release-notes/6.0-compatibility/#legacy-mongo-shell-removed">它把mongo.exe移除改用mongosh來取代</a></p>
+<blockquote>
+<p>The mongo shell is removed from MongoDB 6.0. The replacement is mongosh.</p>
+</blockquote>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#555">...</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>DBException in initAndListen, terminating&#34;,&#34;attr&#34;:{&#34;error&#34;:&#34;NonExistentPath: Data directory C:\\data\\db\\ not found. Create the missing directory or specify another path using (1) the --dbpath command line option, or (2) by adding the &#39;storage.dbPath&#39; option in the configuration file.&#34;}}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#555">...</span><span style="color:#bbb">
+</span></span></span></code></pre><p>會告知您找不到該路徑<code>C:\\data\db</code> (此目錄存放您建立的db資料!)</p>
+<p>所以要去新增這些資料夾給它</p>
+<p>至此您已經安裝好了mongod</p>
+<h3 id="mongosh">MongoSh安裝</h3>
+<blockquote>
+<p><a href="https://www.mongodb.com/try/download/shell">https://www.mongodb.com/try/download/shell</a></p>
+</blockquote>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#000080">Version</span>:<span style="color:#bbb"> </span><span style="color:#099">2.0.1</span><span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 36.1MB</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#000080">Platform</span>:<span style="color:#bbb"> </span>Windows x64(10+)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#000080">Package</span>:<span style="color:#bbb"> </span>zip<span style="color:#bbb">
+</span></span></span></code></pre><p>同樣也把它裡面的bin資料夾加到環境變數</p>
+<p>測試: 打開cmd，執行mongosh.exe</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>mongosh.exe<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 使用預設的連線方式</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>mongosh.exe mongodb://127.0.0.1:12345<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 可以指定要連到哪裡</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>mongosh.exe mongodb://username:password@123.123.123.123:27017/myDBName<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 身分驗證</span><span style="color:#bbb">
+</span></span></span></code></pre><h3 id="mongodb-compass">mongodb-Compass安裝</h3>
+<p>有兩種安裝方法:</p>
+<ol>
+<li><del>透過<code>mongodb\bin\Install-Compass.ps1</code>來進行安裝</del> 不建議</li>
+<li>直接到官網下載 (推薦用這個方法)</li>
+</ol>
+<h4 id="install-compassps1"><del>Install-Compass.ps1</del></h4>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>打開powershell<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 以系統管理員身分</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 注意如果路徑有空白，記得用 &#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>cd &#34;mongodb\bin&#34;<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># mongoD解壓之後的bin資料夾</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Install-Compass.ps1<span style="color:#bbb">
+</span></span></span></code></pre><p>如果它報錯，那麼可能是您設定的關係，</p>
+<p>執行<code>Get-ExecutionPolicy</code>，查看當前您的Policy</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>Get-ExecutionPolicy -List<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 如果您需要查看所有Scope各個的Policy為何，則使用這個指令</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Get-ExecutionPolicy<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>AllSigned<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 那麼表示如果您要運行所有的ps1腳本，該腳本都必須經過簽屬，不然就會報錯</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Set-ExecutionPolicy Restricted<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 設定為限制模式，禁止所有腳本</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>Set-ExecutionPolicy RemoteSigned -Force<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 可以改成這個，之後再改回, 其中的-Force可以避免再出現確認訊息</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#998;font-style:italic"># Set-ExecutionPolicy AllSigned -Scope Process -Force # 您也可以使用-Scope來指定要變更的Scope</span><span style="color:#bbb">
+</span></span></span></code></pre><h4 id="compass">官網下載Compass</h4>
+<blockquote>
+<p><a href="https://www.mongodb.com/try/download/compass">https://www.mongodb.com/try/download/compass</a></p>
+</blockquote>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#000080">Version</span>:<span style="color:#bbb"> </span><span style="color:#099">1.40.2</span><span style="color:#bbb"> </span>(Stable)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#000080">Platform</span>:<span style="color:#bbb"> </span>Windows 64-bit(10+)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#000080">Package</span>:<span style="color:#bbb"> </span>exe<span style="color:#bbb">
+</span></span></span></code></pre><p>完成之後，雙擊這個執行檔就可以執行Compass了</p>
+<p>在首次執行時為有一些隱私設定需要設定，建議只勾前兩項 (以下是1.32.6的版本會問，在1.40.2的版本沒有任何詢問框)</p>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> Enable Automatic Updates</li>
+<li><input checked="" disabled="" type="checkbox"> Enable Geographic Visualization</li>
+<li><input disabled="" type="checkbox"> Enable Crash Reports (傳送錯誤報告)</li>
+<li><input disabled="" type="checkbox"> Enable Usage Statistics (啟動分析(會匿名傳送您的使用習慣))</li>
+<li><input disabled="" type="checkbox"> Give Product Feedback</li>
+</ul>
+<p>URI設定</p>
+<p>您要先啟用mongod.exe 執行server之後他才抓的到</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>mongodb://localhost:27017<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 區網</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>mongodb://127.0.0.1:27017<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 純本機</span><span style="color:#bbb">
+</span></span></span></code></pre><h3 id="heading">環境變數</h3>
+<p>我會建議先新增一個屬於MongoDB的環境變數之後再把此變數加到Path去，而不是直接開啟Path增加</p>
+<p>這樣日後如果有要異動只需要更改MongoDB的變數內容即可</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#998;font-style:italic"># SETX 可以永久更改</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#998;font-style:italic"># /M表示寫在Machine之中 ，有多個路徑可以用;隔開</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>SETX /M Mongo &#34;%ProgramFiles%\Mongo;%programFiles%\Mongo\mongodb-win32-x86_64-windows-7.0.2\bin;%ProgramFiles%\Mongo\mongosh-2.0.1-win32-x64\bin;&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#998;font-style:italic"># 放置變數到PATH之後</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>SETX /M PATH &#34;%PATH%;%Mongo%&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#998;font-style:italic"># 如果太長會被截段，建議還是手動加)</span><span style="color:#bbb">
+</span></span></span></code></pre><p>powershell</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>$mongoRoot = Join-Path $env:ProgramFiles Mongo<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$mongodBin =  Join-Path $mongoRoot mongodb-win32-x86_64-windows-7.0.2\bin<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$mongoshBin = Join-Path $mongoRoot mongosh-2.0.1-win32-x64\bin<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$mongoPaths= (<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>$mongoRoot,<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>$mongodBin,<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>$mongoshBin<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#998;font-style:italic"># 建議裝User，這樣不需要管理員也能直接用</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#998;font-style:italic"># [Environment]::SetEnvironmentVariable(&#34;Mongo&#34;, $mongoPaths -join &#39;;&#39;, [System.EnvironmentVariableTarget]::Machine)</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#998;font-style:italic"># [System.Environment]::GetEnvironmentVariable(&#39;Mongo&#39;).split(&#39;;&#39;) # 需要重新啟動才會生效</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#998;font-style:italic"># [Environment]::SetEnvironmentVariable(&#34;Path&#34;, &#34;$env:Path;&#34; + &#39;%Mongo%&#39;, [System.EnvironmentVariableTarget]::Machine)</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#998;font-style:italic"># [Environment]::SetEnvironmentVariable(&#34;Mongo&#34;, &#34;&#34;, [System.EnvironmentVariableTarget]::Machine) # delete</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>[Environment]::SetEnvironmentVariable(&#34;Mongo&#34;, $mongoPaths -join &#39;;&#39;, [System.EnvironmentVariableTarget]::User)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>[Environment]::SetEnvironmentVariable(&#34;Path&#34;, &#34;$env:Path;&#34; + &#39;%Mongo%&#39;, [System.EnvironmentVariableTarget]::User)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>$env:Path.Split(&#39;;&#39;)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>gcm mongod; gcm mongosh;<span style="color:#bbb">
+</span></span></span></code></pre><h3 id="heading-1">教學影片</h3>
+<ul>
+<li><a href="https://youtu.be/Ph1Z97X6xno">msi版本</a></li>
+<li><a href="https://youtu.be/nI6brMJdO1o">zip版本</a></li>
+</ul>
+<h2 id="usage-">USAGE 使用</h2>
+<p>不論您是要用compass來檢視或者要啟動shell都要先啟動server</p>
+<blockquote>
+<p>mongod.exe</p>
+</blockquote>
+<h3 id="shell">Shell</h3>
+<p>一定要先啟用server: <code>mongod.exe</code></p>
+<p>否則當您運行: <code>mongosh.exe</code></p>
+<p>會遇到:</p>
+<blockquote>
+<p>MongoNetworkError: connect ECONNREFUSED 127.0.0.1:27017</p>
+</blockquote>
+<p>正常啟動會出現類似以下的訊息</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#000080">Current Mongosh Log ID</span>:<span style="color:#bbb"> </span>abcdefghijaskdfmadsf0fbf<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#000080">Connecting to</span>:<span style="color:#bbb"> </span>mongodb://127.0.0.1:27017/?directConnection=true&amp;serverSelectionTimeoutMS=2000&amp;appName=mongosh+1.5.4<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># port預設都是27017</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#000080">Using MongoDB</span>:<span style="color:#bbb"> </span><span style="color:#099">6.0.1</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#000080">Using Mongosh</span>:<span style="color:#bbb"> </span><span style="color:#099">1.5.4</span><span style="color:#bbb">
+</span></span></span></code></pre><p>如果您不用了，想要關閉server可以運行</p>
+<blockquote>
+<p>db.shutdownServer()</p>
+</blockquote>
+<p>就可以把server關閉</p>
+<h3 id="heading-2">進階用法</h3>
+<p>首次您使用，他預設都是在本機127.0.0.1，所以你可以先利用單機模式去設定admin等等相關用戶的權限，</p>
+<p>完成之後再開始把<code>bindIp</code>加上去，再重啟動。</p>
+<p>實際上您還可以傳遞一些參數給mongoD.exe，如下:</p>
+<blockquote>
+<p>mongod.exe --dbpath &quot;C:\data\db&quot; --logpath &quot;C:\data\db\log.log&quot; --port 30000 --bind_ip 127.0.0.1 --directoryperdb</p>
+</blockquote>
+<p>指令還有很多，我建議寫在設定檔之後只要執行:</p>
+<blockquote>
+<p>mongod.exe --config &quot;C:\xxx\mongo.conf&quot;</p>
+</blockquote>
+<p>設定檔的內容</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#000080">systemLog</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#000080">destination</span>:<span style="color:#bbb"> </span>file<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#000080">path</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;C:\\data\\db\\log.log&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#000080">logAppend</span>:<span style="color:#bbb"> </span><span style="color:#000;font-weight:bold">true</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#000080">storage</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#000080">dbPath</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;C:\\data\\db&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#000080">directoryPerDB</span>:<span style="color:#bbb"> </span><span style="color:#000;font-weight:bold">true</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#000080">net</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#000080">port</span>:<span style="color:#bbb"> </span><span style="color:#099">27017</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#000080">bindIp</span>:<span style="color:#bbb"> </span><span style="color:#099">127.0.0.1</span>,<span style="color:#bbb"> </span><span style="color:#099">192.123.123.101</span><span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 有多個ip可以用,隔開就好</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#000080">processManagement</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#000080">windowsService</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#000080">serviceName</span>:<span style="color:#bbb"> </span>MongoDB27017<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#000080">displayName</span>:<span style="color:#bbb"> </span>MongoDB27017<span style="color:#bbb">
+</span></span></span></code></pre><p>您也可以只設定部分資訊就好</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>mongod.exe --config &#34;C:\xxx\mongo.yaml&#34;<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 或者您也可以把設定檔放在cmd一打開的路徑，這樣就不需要再額外寫path給它</span><span style="color:#bbb">
+</span></span></span></code></pre><pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#000080">net</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#000080">port</span>:<span style="color:#bbb"> </span><span style="color:#099">17823</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#000080">bindIp</span>:<span style="color:#bbb"> </span><span style="color:#099">127.0.0.1</span>,<span style="color:#bbb"> </span><span style="color:#099">192.168.17.1</span><span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 有多個ip可以用,隔開  # 放 &#34;乙太網路卡 乙太網路&#34; 的ipv4</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#000080">security</span>:<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 等同 mongod.exe --auth</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#000080">authorization: enabled # 有了這個就必須要用身分登入才行，您可以use到指定的db再建立user，指令類似右方</span>:<span style="color:#bbb"> </span>db.createUser({user: &#34;guest&#34;, pwd: &#34;guest&#34;, roles: [&#34;read&#34;]})<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#000080">processManagement</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#000080">windowsService</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#000080">serviceName</span>:<span style="color:#bbb"> </span>CarsonDB17823<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#000080">displayName</span>:<span style="color:#bbb"> </span>CarsonDB<span style="color:#bbb">
+</span></span></span></code></pre><h2 id="driver">Driver</h2>
+<p>go對它有非常好的支持，可以參考以下網址</p>
+<blockquote>
+<p><a href="https://pkg.go.dev/go.mongodb.org/mongo-driver@v1.10.1/mongo">https://pkg.go.dev/go.mongodb.org/mongo-driver@v1.10.1/mongo</a></p>
+</blockquote>
+<h2 id="httpswwwmongodbcomdocsmanualreferencemongo-shellbasic-shell-javascript-operations"><a href="https://www.mongodb.com/docs/manual/reference/mongo-shell/#basic-shell-javascript-operations">指令</a></h2>
+<p>如果您是在compass中使用mongoSh, 打上關鍵字，他其實就會提是有您可能想輸入的內容</p>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th>desc</th>
+<th>return message</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>show dbs</td>
+<td>注意! 如果資料庫是空的，會看不見</td>
+<td></td>
+</tr>
+<tr>
+<td>show users</td>
+<td>查看當前的db有哪些使用者</td>
+<td></td>
+</tr>
+<tr>
+<td>use mydb</td>
+<td>切換到mydb，如果不存在，會自動建立</td>
+<td>switched to db mydb 告訴您目前已經切換過去</td>
+</tr>
+<tr>
+<td>db.books.insertOne({&quot;name&quot;:&quot;my mongodb book&quot;})</td>
+<td>新增一筆資料到collection名稱為books去(如果該collection不存在會自動建立)</td>
+<td>WriteResult({&quot;nInserted&quot;: 1}) # 告訴您結果: 有一筆資料被插入</td>
+</tr>
+<tr>
+<td>db.myCollection.insertOne({&quot;name&quot;:&quot;my mongodb book&quot;})</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>db.books.find()</td>
+<td>列出collection名稱為books的所有document</td>
+<td></td>
+</tr>
+<tr>
+<td>db.collection.drop()</td>
+<td>刪除collection</td>
+<td></td>
+</tr>
+<tr>
+<td>db.getRoles()</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>show roles</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>show collections</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>db.createRole()</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>.exit</td>
+<td>退出shell</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="heading-3">新建使用者</h2>
+<ul>
+<li><a href="https://www.mongodb.com/docs/manual/tutorial/manage-users-and-roles/">Manage Users and Roles</a></li>
+<li><a href="https://www.mongodb.com/docs/manual/reference/method/db.createUser/">createUser</a></li>
+</ul>
+<p>使用mongosh.exe</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>show users<span style="color:#bbb"> </span><span style="color:#998;font-style:italic"># 查看當前的db有哪些使用者</span><span style="color:#bbb">
+</span></span></span></code></pre><pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#998;font-style:italic">// use admin
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>db.createUser(
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    user<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;yourUserName&#34;</span>,
+</span></span><span style="display:flex;"><span>    pwd<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;yourPassword&#34;</span>,
+</span></span><span style="display:flex;"><span>    roles<span style="color:#000;font-weight:bold">:</span> [{role<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;yourRoleName&#34;</span>, db<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;yourDatabaseName&#34;</span>}]
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre><p>範例:</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>db.createUser(
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    user<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;Carson xxx&#34;</span>,
+</span></span><span style="display:flex;"><span>    pwd<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;xxx&#34;</span>,
+</span></span><span style="display:flex;"><span>    roles<span style="color:#000;font-weight:bold">:</span> [
+</span></span><span style="display:flex;"><span>      {role<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;dbAdminAnyDatabase&#34;</span>, db<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;admin&#34;</span>},
+</span></span><span style="display:flex;"><span>      <span style="color:#d14">&#34;readWriteAnyDatabase&#34;</span> <span style="color:#998;font-style:italic">// 當您只寫一個其實就代表 [role: &#34;readWriteAnyDatabase&#34;, db: &#34;&lt;當前您use的db名稱&gt;&#34;]
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    ]
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 更多範例
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// use admin // 把用戶資料儲存在admin
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>db.createUser(
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    user<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;Carson&#34;</span>,
+</span></span><span style="display:flex;"><span>    pwd<span style="color:#000;font-weight:bold">:</span> passwordPrompt(),
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// userAdminAnyDatabase: 可以看到db
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#998;font-style:italic">// dbAdminAnyDatabase: 可以看到db.document的名稱，但不能訪問
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    roles<span style="color:#000;font-weight:bold">:</span> [<span style="color:#d14">&#34;root&#34;</span>] <span style="color:#998;font-style:italic">// 給管理員超級權限
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>  }
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre><pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>db.createUser(
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    user<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;guest&#34;</span>,
+</span></span><span style="display:flex;"><span>    pwd<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;guest&#34;</span>,
+</span></span><span style="display:flex;"><span>    roles<span style="color:#000;font-weight:bold">:</span> [
+</span></span><span style="display:flex;"><span>      {role<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;read&#34;</span>, db<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;ocr&#34;</span>}
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>  })
+</span></span></code></pre><blockquote>
+<p>除了建議超級用戶外，不建議直接用createUser，建議先建立想要的role之後再用此role去創建</p>
+</blockquote>
+<p>移除</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>db.dropUser(<span style="color:#d14">&#34;guest&#34;</span>)
+</span></span></code></pre><h3 id="rolehttpswwwmongodbcomdocsmanualreferencebuilt-in-rolesall-database-roles"><a href="https://www.mongodb.com/docs/manual/reference/built-in-roles/#all-database-roles">role</a></h3>
+<ul>
+<li>Read：只能讀</li>
+<li>readWrite：讀、寫都可</li>
+<li>dbAdmin：允許用戶在指定數據庫中執行管理函數，如索引創建、刪除，查看統計或訪問system.profile <strong>不能調整role</strong></li>
+<li>userAdmin：允許用戶向system.users集合寫入，可以找指定數據庫裡創建、刪除和<strong>管理用戶</strong>(調整role)</li>
+<li>dbOwner:</li>
+<li>clusterAdmin：只在admin數據庫中可用，賦予用戶所有分片和複製集相關函數的管理權限。</li>
+<li>clusterManager</li>
+</ul>
+<hr>
+<ul>
+<li>readAnyDatabase：只在admin數據庫中可用，賦予用戶所有數據庫的讀權限</li>
+<li>readWriteAnyDatabase：只在admin數據庫中可用，賦予用戶所有數據庫的讀寫權限</li>
+<li>userAdminAnyDatabase：只在admin數據庫中可用，賦予用戶所有數據庫的userAdmin權限</li>
+<li>dbAdminAnyDatabase：只在admin數據庫中可用，賦予用戶所有數據庫的dbAdmin權限。</li>
+</ul>
+<hr>
+<ul>
+<li>root：只在admin數據庫中可用。超級賬號，超級權限</li>
+</ul>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>db.adminCommand({
+</span></span><span style="display:flex;"><span>  createRole<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;myClusterwideAdmin&#34;</span>,
+</span></span><span style="display:flex;"><span>  privileges<span style="color:#000;font-weight:bold">:</span> [
+</span></span><span style="display:flex;"><span>    {resource<span style="color:#000;font-weight:bold">:</span> {db<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;config&#34;</span>, collection<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;&#34;</span>}, actions<span style="color:#000;font-weight:bold">:</span> [<span style="color:#d14">&#34;find&#34;</span>, <span style="color:#d14">&#34;update&#34;</span>, <span style="color:#d14">&#34;insert&#34;</span>, <span style="color:#d14">&#34;remove&#34;</span>]}, <span style="color:#998;font-style:italic">// targetDB: config, target: collection: 空白表示 所有
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    {resource<span style="color:#000;font-weight:bold">:</span> {db<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;users&#34;</span>, collection<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;usersCollection&#34;</span>}, actions<span style="color:#000;font-weight:bold">:</span> [<span style="color:#d14">&#34;update&#34;</span>, <span style="color:#d14">&#34;insert&#34;</span>, <span style="color:#d14">&#34;remove&#34;</span>]},
+</span></span><span style="display:flex;"><span>    {resource<span style="color:#000;font-weight:bold">:</span> {db<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;&#34;</span>, collection<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;&#34;</span>}, actions<span style="color:#000;font-weight:bold">:</span> [<span style="color:#d14">&#34;find&#34;</span>]}
+</span></span><span style="display:flex;"><span>  ],
+</span></span><span style="display:flex;"><span>  roles<span style="color:#000;font-weight:bold">:</span> [ <span style="color:#998;font-style:italic">// 表示此role會繼承的項目
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    {role<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;read&#34;</span>, db<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;admin&#34;</span>} <span style="color:#998;font-style:italic">// parent role name, parent db name
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>  ],
+</span></span><span style="display:flex;"><span>  writeConcern<span style="color:#000;font-weight:bold">:</span> {w<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;majority&#34;</span>, wtimeout<span style="color:#000;font-weight:bold">:</span> <span style="color:#099">5000</span>}
+</span></span><span style="display:flex;"><span>})
+</span></span></code></pre><p>刪除role</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>db.runCommand({
+</span></span><span style="display:flex;"><span>  dropRole<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;myClusterwideAdmin&#34;</span>,
+</span></span><span style="display:flex;"><span>})
+</span></span></code></pre><p>創建腳色使用自定義的role</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>db.createUser({user<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;test&#34;</span> , pwd<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;123&#34;</span>, roles<span style="color:#000;font-weight:bold">:</span> [  <span style="color:#d14">&#34;myClusterwideAdmin&#34;</span> ]})
+</span></span></code></pre><h2 id="-connection">使用身分進行連線 (Connection)</h2>
+<blockquote>
+<p>mongodb://username:password@123.123.123.123:27017/myDBName</p>
+</blockquote>
+</body>
+
+<footer class="fixed-bottom">
+</footer>
+</html>
