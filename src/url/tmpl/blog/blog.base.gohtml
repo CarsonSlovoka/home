@@ -4,7 +4,7 @@
     {{template "head.gohtml" .}}
   <script src="/static/js/clipboard/copy-pre.js"></script>
 
-    {{ if .EnableMarkMapToc }}
+    {{ if not .Disable.MarkMap }}
       <link rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"> {{/* 這個css裡面還有包含很多woff，單純抓這個css沒有woff也沒用 */}}
       <script src="/static/js/pkg/d3.js"></script> {{/* 不需要特別加上版號，min.js裡面已經包含 */}}
@@ -27,9 +27,10 @@
 
 {{end -}}
 
+{{/* 底下這種是給單獨md檔案靠layout來渲染的方式 */}}
 {{ if hasSuffix .Filepath ".md" -}}
-    {{/*  {{md "blog/bitbucket.md" .}} */}}
-    {{md .Filepath .}}
+    {{- /*  {{md "blog/bitbucket.md" .}} */ -}}
+    {{md .Filepath . -}}
 {{end -}}
 </body>
 

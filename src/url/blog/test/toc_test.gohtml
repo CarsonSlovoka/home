@@ -2,5 +2,7 @@
 {{define "body"}}
     {{md "blog/test/toc_test.md" .}}
 
-    {{.TableOfContents}}
+    {{- /* 如果有需要用到某一個文章的TOC(ul)模式的版本，可以考慮用以下的方式
+    {{toc (md "blog/test/toc_test.md" .)}}
+    */ -}}
 {{end}}

@@ -5,7 +5,6 @@ package main
 import (
 	"carson.io/pkg/bytes"
 	io2 "carson.io/pkg/io"
-	"carson.io/pkg/tpl/funcs"
 	"context"
 	"fmt"
 	filepath2 "github.com/CarsonSlovoka/go-pkg/v2/path/filepath"
@@ -25,8 +24,8 @@ import (
 
 type Config struct {
 	*Server
-	excludeFiles      []string
-	funcs.SiteContext // 不使用指標，我們希望用此變數傳入Execute時，它的ctx彼此都是獨立，不會因為有些頁面改變而受到影響
+	excludeFiles []string
+	SiteContext  // 不使用指標，我們希望用此變數傳入Execute時，它的ctx彼此都是獨立，不會因為有些頁面改變而受到影響
 }
 
 type Server struct {
@@ -54,20 +53,15 @@ func init() {
 
 			// `url\\blog\\.*\.md`,   // ~~不需要source，留下html即可~~ md也改成可以有fontMatter即可單獨存在，所以也要保留
 			`url\\blog\\test\\.*`, // 測試用的檔案都不複製
-		}, funcs.SiteContext{ // 設定預設值，注意，這裡的ctx是獨立的，各個頁面可以針對該ctx進行修改，都不會影響到彼此
-			Title:            "Carson-Blog",
-			Version:          "0.0.0",
-			LastBuildTime:    now, // .Format("2006-01-02 15:04")
-			EnableMarkMapToc: true,
+		}, SiteContext{ // 設定預設值，注意，這裡的ctx是獨立的，各個頁面可以針對該ctx進行修改，都不會影響到彼此
+			RootTitle:     "Carson-Blog",
+			Version:       "0.0.0",
+			LastBuildTime: now, // .Format("2006-01-02 15:04")
 		},
 	}
 }
 
-func render(src, dst string, ctx *struct {
-	funcs.SiteContext
-	Filepath string
-	context.Context
-}, tmplFiles []string) error {
+func render(src, dst string, ctx *PageContext, tmplFiles []string) error {
 	dstFile, err := os.Create(dst)
 	if err != nil {
 		return err
@@ -81,7 +75,7 @@ func render(src, dst string, ctx *struct {
 
 	t := textTemplate.Must(
 		textTemplate.New(filepath.Base(src)).
-			Funcs(funcs.GetUtilsFuncMap()).
+			Funcs(tmplFuncMaps).
 			ParseFiles(parseFiles...),
 	)
 	// ctx := config.SiteContext       // copy數值過去，避免原本的SiteContext被異動，注意之所以能這樣用是因為我們的SiteContext目前都沒有存在任何指標類的成員，如果有指標類的成員，這些數值會變成共用，就會不安全要避免
@@ -136,13 +130,11 @@ func build(outputDir string) error {
 			// dst := filepath.Join("../docs/", strings.Replace(src, "url\\", "", 1)) // filepath.Join反斜線會自動修正，所以這樣也可以
 			dst := filepath.Join(outputDir, strings.Replace(srcPath, "url\\", "", 1))
 
-			ctx := &struct {
-				funcs.SiteContext
-				Filepath string
-				context.Context
-			}{
+			ctx := &PageContext{
 				config.SiteContext,
 				"",
+				FrontMatter{},
+				// "",
 				nil,
 			}
 			switch filepath.Ext(dst) {
@@ -170,7 +162,8 @@ func build(outputDir string) error {
 				if fm == nil { // 表示這個檔案沒有frontMatter，就不處理
 					continue
 				}
-				ctx.Context = context.WithValue(context.TODO(), "frontMatter", fm)
+				ctx.Context = context.TODO()
+				ctx.FrontMatter = *fm
 				ctx.Filepath = strings.TrimPrefix(srcPath, "url") // 這個路徑是給md用的，它裡面預設已經在url路徑，所以不用在加)
 				srcPath = filepath.Join("url/tmpl", fm.Layout)
 				if err = render(srcPath, dst, ctx, tmplFiles); err != nil {
@@ -259,20 +252,18 @@ func BuildServer(isLocalMode bool) (server *http.Server, listener net.Listener) 
 
 			t := htmlTemplate.Must(
 				htmlTemplate.New(filepath.Base(src)).
-					Funcs(funcs.GetUtilsFuncMap()).
+					Funcs(tmplFuncMaps).
 					ParseFiles(parseFiles...),
 			)
 
 			ctx := config.SiteContext // 複製，使其能夠被修改而不影響原本的物件(注意如果物件本身有其他指標類的結構，此種複製方法是不安全的，該類的數值修改會影響到本體)
 			// if err = t.Execute(w, &ctx); err != nil {
-			if err = t.Execute(w, &struct {
-				funcs.SiteContext
-				Filepath string
-				context.Context
-			}{
+			if err = t.Execute(w, &PageContext{
 				ctx,
 				src,
-				nil,
+				FrontMatter{},
+				// "",
+				context.TODO(),
 			}); err != nil {
 				log.Printf("%s\n", err.Error())
 			}
@@ -328,20 +319,18 @@ func BuildServer(isLocalMode bool) (server *http.Server, listener net.Listener) 
 
 			t := htmlTemplate.Must(
 				htmlTemplate.New(filepath.Base(layoutPath)).
-					Funcs(funcs.GetUtilsFuncMap()).
+					Funcs(tmplFuncMaps).
 					ParseFiles(parseFiles...),
 			)
 
 			siteCtx := config.SiteContext // copy
-			ctx := context.WithValue(context.TODO(), "frontMatter", fm)
-			if err = t.Execute(w, &struct {
-				funcs.SiteContext
-				Filepath string
-				context.Context
-			}{
+
+			if err = t.Execute(w, &PageContext{
 				siteCtx,
 				strings.TrimPrefix(srcPath, "url"), // 這個路徑是給md用的，它裡面預設已經在url路徑，所以不用在加)
-				ctx,
+				*fm,
+				// "",
+				context.TODO(),
 			}); err != nil {
 				log.Printf("%s\n", err.Error())
 			}

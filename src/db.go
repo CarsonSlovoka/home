@@ -44,8 +44,8 @@ type FrontMatter struct {
 		MarkMap bool `json:"markMap"`
 	}
 
-	CreateTime  time.Time `json:"cTime"`
-	LastModTime time.Time `json:"mTime"`
+	CreateTime    time.Time `json:"cTime"`
+	LastModTime   time.Time `json:"mTime"`
 }
 
 func init() {
