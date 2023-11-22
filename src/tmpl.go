@@ -62,6 +62,9 @@ type PageContext struct {
 	// 如果您在一般的自定義HTML頁面，也想用某個md的toc來製作，可以用toc來幫助: ex: {{toc (md "my.md" .)}}
 	// TableOfContents template.HTML
 
+	// SourceHash 用來判別source檔案是否有被異動，用於判斷build的時候，是否要重建
+	SourceHash string
+
 	context.Context
 }
 

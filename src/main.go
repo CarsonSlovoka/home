@@ -5,9 +5,12 @@ package main
 import (
 	"bytes"
 	bytes2 "carson.io/pkg/bytes"
+	html2 "carson.io/pkg/html"
 	io2 "carson.io/pkg/io"
 	. "carson.io/pkg/utils"
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	filepath2 "github.com/CarsonSlovoka/go-pkg/v2/path/filepath"
 	"github.com/CarsonSlovoka/go-pkg/v2/tpl/template"
@@ -64,7 +67,7 @@ func init() {
 	}
 }
 
-func render(src, dst string, ctx *PageContext, tmplFiles []string) error {
+func render(src, dst string, ctx *PageContext, tmplFiles []string, forceBuildAll bool) error {
 	parseFiles, err := template.GetAllTmplName(os.ReadFile, src, tmplFiles)
 	if err != nil {
 		return err
@@ -83,17 +86,32 @@ func render(src, dst string, ctx *PageContext, tmplFiles []string) error {
 	}
 	bs, _ := io.ReadAll(buf)
 
-	// 檔案內容如果完全一樣，就不再寫入
-	// TODO:但是LastBuildTime會用當天的日期創建，所以就算資料沒異動，到隔天再重建還是會被修改
-	if _, err = os.Stat(dst); !os.IsNotExist(err) {
-		bs2, err := os.ReadFile(dst)
-		if err != nil {
-			return err
-		}
+	if !forceBuildAll {
+		// 檔案內容如果完全一樣，就不再寫入
+		if _, err = os.Stat(dst); !os.IsNotExist(err) {
+			var bs2 []byte
+			bs2, err = os.ReadFile(dst)
+			if err != nil {
+				return err
+			}
 
-		if bytes.Compare(bs, bs2) == 0 {
-			PInfo.Printf("檔案: %q | 因內容沒有異動，故不渲染 \n", dst)
-			return nil
+			elem := html2.QuerySelector(string(bs2), "meta", func(elem *html2.Element) bool {
+				if elem.GetAttr("name") == "source-hash" {
+					return true
+				}
+				return false
+			})
+
+			if elem != nil && elem.GetAttr("content") != "" { // 如果抓的到source-hash就用它來當成比較依據
+				hash := elem.GetAttr("content")
+				if hash != "" && hash == ctx.SourceHash {
+					PInfo.Printf("檔案: %q | 因內容沒有異動(SourceHash相同)，故不渲染 \n", dst)
+					return nil
+				}
+			} else if bytes.Compare(bs, bs2) == 0 { // 如果都沒有就直接以最後的檔案內容當參考去比較
+				PInfo.Printf("檔案: %q | 因內容沒有異動，故不渲染 \n", dst)
+				return nil
+			}
 		}
 	}
 
@@ -113,7 +131,7 @@ func render(src, dst string, ctx *PageContext, tmplFiles []string) error {
 	return nil
 }
 
-func build(outputDir string) error {
+func build(outputDir string, forceBuildAll bool) error {
 	var (
 		mirrorDir func(rootSrc string, dst string, excludeList []string) error
 	)
@@ -165,6 +183,7 @@ func build(outputDir string) error {
 				config.SiteContext,
 				"",
 				FrontMatter{},
+				"", // 如果是客製化的html，不可慮使用，因為它有可能用到很多其他檔案，都要判別有沒有異動太麻煩
 				// "",
 				nil,
 			}
@@ -172,7 +191,7 @@ func build(outputDir string) error {
 			case ".gohtml":
 				dst = dst[:len(dst)-6] + "html"
 				ctx.Filepath = srcPath
-				if err = render(srcPath, dst, ctx, tmplFiles); err != nil {
+				if err = render(srcPath, dst, ctx, tmplFiles, forceBuildAll); err != nil {
 					return err
 				}
 			case ".md":
@@ -202,8 +221,14 @@ func build(outputDir string) error {
 				ctx.Context = context.TODO()
 				ctx.FrontMatter = *fm
 				ctx.Filepath = strings.TrimPrefix(srcPath, "url") // 這個路徑是給md用的，它裡面預設已經在url路徑，所以不用在加)
+
+				genMd5 := md5.New()
+				genMd5.Write(src)
+				md5Hash := hex.EncodeToString(genMd5.Sum(nil))
+				ctx.SourceHash = md5Hash
+
 				srcPath = filepath.Join("url/tmpl", fm.Layout)
-				if err = render(srcPath, dst, ctx, tmplFiles); err != nil {
+				if err = render(srcPath, dst, ctx, tmplFiles, forceBuildAll); err != nil {
 					return err
 				}
 			default:
@@ -299,6 +324,7 @@ func BuildServer(isLocalMode bool) (server *http.Server, listener net.Listener) 
 				ctx,
 				src,
 				FrontMatter{},
+				"", // 如果是屬於客製化的HTML，就不考慮這個數值，不然要去額外判斷所有他用到的東西有沒有被異動太麻煩
 				// "",
 				context.TODO(),
 			}); err != nil {
@@ -367,10 +393,16 @@ func BuildServer(isLocalMode bool) (server *http.Server, listener net.Listener) 
 
 			siteCtx := config.SiteContext // copy
 
+			// 計算 MD5
+			genMd5 := md5.New()
+			genMd5.Write(src)
+			md5Hash := hex.EncodeToString(genMd5.Sum(nil))
+
 			if err = t.Execute(w, &PageContext{
 				siteCtx,
 				strings.TrimPrefix(srcPath, "url"), // 這個路徑是給md用的，它裡面預設已經在url路徑，所以不用在加)
 				*fm,
+				md5Hash,
 				// "",
 				context.TODO(),
 			}); err != nil {

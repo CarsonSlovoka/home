@@ -3,7 +3,10 @@
 - `help` 查看可用的指令(目前只寫了`build`而已)
 - 可以透過`build`指令建立實體的HTML文件
 
-  > build -f -o=..\\docs\\
+  ```yaml
+  build -f -o=..\\docs\\ # -f表示目錄存在還是會強制建立
+  build -f -o=..\\docs\\ -forceBuildAll # 不進行比較，強制建立所有東西
+  ```
 
   注意-o不要加上雙引號，例如`-o="..\\docs\\"`會發生錯誤
 

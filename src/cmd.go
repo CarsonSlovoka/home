@@ -18,14 +18,16 @@ import (
 )
 
 type ParaBuild struct {
-	outputDir string
-	isForce   bool
+	outputDir     string
+	isForce       bool
+	forceBuildAll bool // 若為true則不進行比較，即使來源與目的完全一樣，也會重新建置
 }
 
 func initFlagSetBuild(p *ParaBuild) *flag.FlagSet {
 	f := flag.NewFlagSet("build", flag.ContinueOnError)
 	f.BoolVar(&p.isForce, "f", false, "Forced overwrite of output folders")
 	f.StringVar(&p.outputDir, "o", "..\\docs\\", "The output directory")
+	f.BoolVar(&p.forceBuildAll, "forceBuildAll", false, "forceBuildAll")
 	return f
 }
 
@@ -48,8 +50,8 @@ func shutdownServer(server *http.Server) error {
 }
 
 func startCMD(wg *sync.WaitGroup) {
-	paraBuild := new(ParaBuild)
 	paraRun := new(ParaRun)
+	paraBuild := new(ParaBuild)
 	flagSetBuild := initFlagSetBuild(paraBuild)
 	flagSetRun := initFlagRun(paraRun)
 	flagSetShutdownServer := flag.NewFlagSet("shutdownServer", flag.ContinueOnError)
@@ -74,6 +76,8 @@ func startCMD(wg *sync.WaitGroup) {
 			return "quit", err
 		case "build":
 			{
+				paraBuild.forceBuildAll = false // 避免第二次呼叫，他的某些數值套用前一次的值
+				paraBuild.isForce = false
 				if err = flagSetBuild.Parse(args[1:]); err != nil {
 					// 會自動觸發預設的錯誤
 					return "", PErr.Errorf("parse build error")
@@ -85,7 +89,7 @@ func startCMD(wg *sync.WaitGroup) {
 					}
 				}
 				POk.Println("Start build...")
-				err = build(p.outputDir)
+				err = build(p.outputDir, p.forceBuildAll)
 				POk.Println("End build")
 			}
 
