@@ -1,6 +1,6 @@
 ## USAGE
 
-- `help` 查看可用的指令(目前只寫了`build`而已)
+- `help` 查看[可用的指令](https://github.com/CarsonSlovoka/CarsonSlovoka.github.io/blob/071430aa50868fb8010bdd6948abcabdef0a92c1/src/cmd.go#L66-L145)
 - 可以透過`build`指令建立實體的HTML文件
 
   ```yaml
