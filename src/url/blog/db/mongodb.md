@@ -406,6 +406,16 @@ db.runCommand({
 db.createUser({user: "test" , pwd: "123", roles: [  "myClusterwideAdmin" ]})
 ```
 
+## collection
+
+rename:
+
+```yaml
+db.OldCollection.renameCollection("newCollectionName")
+# 注意如果OldCollection的名稱都是數字，那麼請用以下的方式:
+db["20231226"].renameCollection("20231226_xxx")
+```
+
 ## 使用身分進行連線 (Connection)
 
 > mongodb://username:password@123.123.123.123:27017/myDBName
