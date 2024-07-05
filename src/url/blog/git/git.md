@@ -4,7 +4,7 @@
   "tags": [ "git"],
   "layout": "blog/blog.base.gohtml",
   "cTime": "2024-07-02T00:00:00+08:00",
-  "mTime": "2023-07-02T00:00:00+08:00"
+  "mTime": "2023-07-05T00:00:00+08:00"
 }
 ---
 
@@ -47,4 +47,29 @@ git cherry-pick (start..end]  # 注意，開頭的項目是沒有包含進去的
 
 # 例如:
 git cherry-pick 5fb80a1f..879842c70c
+```
+
+### 練習
+
+
+![](img/cherry-pick_range.png)
+
+假設你想要在aaa的位置，將下方藍色區塊，也就是sha:123到sha789的內容搬移到aaa的上方
+
+那麼可以使用指令
+
+```yaml
+git cherry-pick 456..789 # 要選的是456，因為123是不包含的，你需要找123的前一個點，如果123的先前有多個岔路，會依據終點789，就能知道岔路是哪一條
+```
+
+### gitk
+
+你可以使用`gitk --all`得到完整的圖表
+
+也可以專注於某一個{tag, branch, sha1}
+
+```yaml
+gitk <branch>
+gitk <tag>
+gitk <sha1>
 ```
