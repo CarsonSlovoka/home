@@ -3,8 +3,8 @@
   "title": "eudcEdit",
   "tags": [ "unicode", "font", "private" ],
   "layout": "blog/blog.base.gohtml",
-  "cTime": "2024-06-28T00:00:00+08:00",
-  "mTime": "2023-06-28T00:00:00+08:00"
+  "cTime": "2024-06-28",
+  "mTime": "2023-06-28"
 }
 ---
 

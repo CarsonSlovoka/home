@@ -3,8 +3,8 @@
   "title": "mongoDB",
   "tags": [ "db", "mongodb" ],
   "layout": "blog/blog.base.gohtml",
-  "cTime": "2023-09-30T00:00:00+08:00",
-  "mTime": "2023-09-30T00:00:00+08:00"
+  "cTime": "2023-09-30 00:00",
+  "mTime": "2023-09-30 00:00"
 }
 ---
 

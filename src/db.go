@@ -3,6 +3,7 @@ package main
 import (
 	bytes2 "carson.io/pkg/bytes"
 	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -44,13 +45,19 @@ type FrontMatter struct {
 		MarkMap bool `json:"markMap"`
 	}
 
-	CreateTime  time.Time `json:"cTime"`
-	LastModTime time.Time `json:"mTime"`
+	CreateTime  JsonTime `json:"cTime"`
+	LastModTime JsonTime `json:"mTime"`
 }
 
 func init() {
+	var err error
+	locTaipei, err = time.LoadLocation("Asia/Taipei")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	targetDir := "./url/blog"
-	err := filepath.Walk(targetDir, func(path string, info fs.FileInfo, err error) error {
+	err = filepath.Walk(targetDir, func(path string, info fs.FileInfo, err error) error {
 		if err != nil { // <-- 這個要補上，如果targetDir這個路徑錯誤，這個err會是該錯誤
 			panic(err)
 		}
