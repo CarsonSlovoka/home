@@ -1,10 +1,10 @@
 ---
 {
   "title": "crypto",
-  "tags": [ "crypto", "ras", "hmac", "ed25519" ],
+  "tags": [ "crypto", "ras", "hmac", "ed25519", "GPG", "rsa.OAEP" ],
   "layout": "blog/blog.base.gohtml",
   "cTime": "2024-08-11 14:33",
-  "mTime": "2024-08-14"
+  "mTime": "2024-08-19"
 }
 ---
 
@@ -113,6 +113,72 @@ rsa.SignPKCS1v15其實裡面還有做一些填充的方法，來將資料轉換�
 - 長度: 填充多少垃圾來達到滿長度
 
 [playground](https://go.dev/play/p/W1vH5B7eL5z)
+
+### RSA.OAEP (Optimal Asymmetric Encryption Padding)
+
+這個演算法可以將對方的公鑰把訊息加密，解密的時候只有其私鑰才能解
+
+此算法在GPG(GNU Privacy Guard)很有用
+
+```
+privateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
+publicKey := &privateKey.PublicKey
+message := []byte("my data")
+iHasher := sha256.New()
+encryptedData, _ := rsa.EncryptOAEP(iHasher, rand.Reader, publicKey, message, nil)
+message2, _ := rsa.DecryptOAEP(iHasher, rand.Reader, privateKey, encryptedData, nil)
+```
+[go-playground](https://go.dev/play/p/KZjcf90h8N5)
+
+## [GPG(GNU Privacy Guard)](https://gist.github.com/CarsonSlovoka/1876a3ae7cd821a201d39aa96beccffe)
+
+![](img/gpg_process.png)
+
+```
+Encrypt(
+  data []byte,
+  publicKey *rsa.PublicKey,
+  symmetricKey[]byte
+) (
+  []byte // 輸出資料 symmetricAlg(data, symmetricKey) + rsa.EncryptOAEP(publicKey, symmetricKey)
+)
+```
+餵入一個隨機生成出來的隨機數，以及公鑰內容。
+
+Encrypt使用此隨機數當成對稱式加密的密鑰，對原始內容進行加密
+
+為了能讓對方也能得知此隨機數，將此亂數用[rsa.OAEP](https://en.wikipedia.org/wiki/Optimal_asymmetric_encryption_padding)進行加密: 它會使用到對方提供的公鑰
+
+由於加密出來的產物，如果要解開，只能用此公鑰對應的私鑰才能解，因此理論上只有私鑰擁有者才能解
+
+---
+
+```
+Encrypt(
+  data []byte,
+  privateKey *rsa.PrivateKey,
+) []byte
+```
+
+解密過程，解密的格式一般是公開的，因此可以很容易的從data分離出加密過的數據{encryptedData, encryptedSymmetricKey}
+
+由於encryptedSymmetricKey，只要擁有其對應的私鑰，就能解除
+
+解完之後可得symmetricKey，由於encryptedData的內容是使用此key用對稱式密鑰去加簽，因此在已得到還原的key時，就能解密，所以可得原始內容
+
+### 討論
+
+- 會話密鑰的複雜性：GPG生成的會話密鑰通常是非常長且隨機的。這使得暴力破解在計算上變得不可行
+- 公鑰加密: 會話密鑰本身是用接收者的公鑰加密的。除非你能破解RSA或其他公鑰加密算法(這在計算上是極其困難的),否則你無法獲得會話密鑰
+- 對稱加密算法的強度：GPG使用的對稱加密算法(如AES)被設計為即使攻擊者知道所使用的算法,也無法在沒有密鑰的情況下破解
+- 密鑰管理：GPG的安全性很大程度上取決於用戶如何保護他們的私鑰。如果私鑰被妥善保管,即使攻擊者截獲了加密的通信,也無法解密
+- 前向保密：每次通信都使用新的會話密鑰,這意味著即使一個會話被破解,也不會危及其他會話的安全
+
+如果你的過程分成很多通信且你的資料只有在所有內容都有時才有意義，那麼要破解就代表他必須掌握每一段通信，且每一段通信的會話密鑰要被破解，之後才能組裝起來，因此困難度相當大
+
+### 範例
+
+<script src="https://gist.github.com/CarsonSlovoka/1876a3ae7cd821a201d39aa96beccffe.js"></script>
 
 ## Ed25519與RSA的比較
 
