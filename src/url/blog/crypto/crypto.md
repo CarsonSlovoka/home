@@ -1,10 +1,10 @@
 ---
 {
   "title": "crypto",
-  "tags": [ "crypto", "ras", "hmac", "ed25519", "GPG", "rsa.OAEP" ],
+  "tags": [ "crypto", "ras", "hmac", "ed25519", "GPG", "rsa.OAEP", "ssh" ],
   "layout": "blog/blog.base.gohtml",
   "cTime": "2024-08-11 14:33",
-  "mTime": "2024-08-19"
+  "mTime": "2024-08-20"
 }
 ---
 
@@ -145,11 +145,24 @@ Encrypt(
 ```
 餵入一個隨機生成出來的隨機數，以及公鑰內容。
 
-Encrypt使用此隨機數當成對稱式加密的密鑰，對原始內容進行加密
+Encrypt使用此隨機數當成對稱式加密的密鑰(用此隨機數產生會話密鑰)，對原始內容進行對稱式加密
 
-為了能讓對方也能得知此隨機數，將此亂數用[rsa.OAEP](https://en.wikipedia.org/wiki/Optimal_asymmetric_encryption_padding)進行加密: 它會使用到對方提供的公鑰
+為了能讓對方也能得知此隨機數，將此亂數用[rsa.OAEP](https://en.wikipedia.org/wiki/Optimal_asymmetric_encryption_padding)進行加密: 它會使用到對方提供的公鑰 (即**用另一者的公鑰對會話密鑰進行加密**)
 
 由於加密出來的產物，如果要解開，只能用此公鑰對應的私鑰才能解，因此理論上只有私鑰擁有者才能解
+
+加密後的內容與加密後的密鑰會一起發出給對方。
+
+過程整理:
+
+假設Carson要與Alice溝通
+
+1. Carson生成一個隨機的會話密鑰
+2. 使用這個會話密鑰對原始內容進行對稱加密
+3. Carson使用Alice的公鑰對會話密鑰進行非對稱加密(rsa.OAEP.encrypt)
+4. Carson將加密的內容和加密的會話密鑰一起發送給Alice
+5. Alice使用自己的私鑰解密會話密鑰(rsa.OAEP.decrypt)
+6. Alice使用解密後的會話密鑰來解密原始內容
 
 ---
 
@@ -179,6 +192,27 @@ Encrypt(
 ### 範例
 
 <script src="https://gist.github.com/CarsonSlovoka/1876a3ae7cd821a201d39aa96beccffe.js"></script>
+
+## SSH (Secure Shell)
+
+Client連接到Server:
+
+1. 客戶端向Server發出請求，通常使用的端口號是22 `ssh -p 22 userName@hostName`
+2. 服務器會把公鑰給客戶端。如果客戶端首次連接到服務器，會詢問是否要信任此公鑰
+3. 客戶端生成一個隨機的會話密鑰，使用服務器的公鑰對其進行加密(rsa.OAEP)，然後發送給服務器
+4. 服務器使用其私鑰解密會話密鑰
+5. 此後，雙方使用這個會話密鑰進行對稱加密通信 (注意此時只有客戶端，確認真的是與伺服器溝通；但是對於服務器而言，它仍然不曉得這個客戶是誰)
+6. 驗證: 認證還是基於會話密鑰，只是最後server要做最後判斷
+    - 密碼認證: 不推薦(也就是沒有公鑰的情況下的認證，例如:`PasswordCallback`的流程)
+    - 公鑰認證: (`PublicKeyCallback`)
+      - 理論上客戶端需要事先將其公鑰傳到服務器
+      - 服務器生成一個隨機字符串(挑戰)
+      - 服務器使用客戶端的公鑰加密這個挑戰，然後發給客戶端
+      - 客戶端收到此挑戰後，用自己的私鑰解密
+      - 客戶端使用某種約定方式(通常是會話ID)處理加密的挑戰，然後用私鑰對結果進行簽名
+      - 客戶將此簽名發送給服務器
+      - 服務器使用之前保存在客戶端的公鑰對此簽名進行驗證
+7. 服務器驗證認證信息，如果正確，則建立安全的SSH會話
 
 ## Ed25519與RSA的比較
 
