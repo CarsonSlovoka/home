@@ -84,7 +84,7 @@ func init() {
 				}
 				frontM, _, err = bytes2.GetFrontMatter[FrontMatter](b, false)
 				if err != nil {
-					panic(err)
+					panic(path + " " + err.Error())
 				}
 				if frontM == nil {
 					return nil
