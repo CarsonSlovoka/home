@@ -10,9 +10,12 @@
 
 # linux ubuntu作業系統安裝教學
 
-- Linux 核心：這是一個開放原始碼的核心，由 Linus Torvalds 等開發者共同維護。核心負責處理底層的硬體資源管理，例如記憶體、處理器、網路等。
+- Unix: Unix 的原始代碼通常是專有的，不會公開發佈。許多 Unix 系統需要購買授權才能使用。
+- Linux 核心：它是基於 Unix 的設計理念，但並非直接來自 Unix 代碼，而是從頭開始構建的。Linux 完全是開源的，任何人都可以免費使用和修改，由 Linus Torvalds 等開發者共同維護。核心負責處理底層的硬體資源管理，例如記憶體、處理器、網路等。
+- macOS: 是基於 Darwin 作業系統. 這是一個開源的 Unix 衍生系統，並包含了來自 BSD（Berkeley Software Distribution）的許多核心元件。Darwin 核心是 XNU（"X is Not Unix"）內核，結合了微內核和單體內核的特性
 - Linux 發行版：以 Linux 核心為基礎，許多開發團隊會加入額外的軟體工具、桌面環境、應用程式和安裝管理系統，並形成所謂的「發行版」。例如 Ubuntu 就是一個流行的 Linux 發行版之一
 - Ubuntu：Ubuntu 是由 Canonical 公司開發和維護的發行版，以 Debian 為基礎，並使用 Linux 核心。Ubuntu 因為其易於安裝、使用方便和社群支持度高，因此在個人電腦、伺服器以及雲端環境中很受歡迎。
+
 
 ---
 
