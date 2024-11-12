@@ -4,7 +4,7 @@
   "tags": [ "os", "linux", "install", "ubuntu"],
   "layout": "blog/blog.base.gohtml",
   "cTime": "2024-11-05T19:00:00+08:00",
-  "mTime": "2024-11-05T19:00:00+08:00"
+  "mTime": "2024-11-12T19:00:00+08:00"
 }
 ---
 
@@ -66,6 +66,40 @@ UBUNTU 24_0 檔案系統FAT32
 並且在檔案總管的該硬碟也確實可以被點進去查看到相關檔案
 
 ![explorer_ubuntu_24.webp](img/explorer_ubuntu_24.webp)
+
+
+## [磁碟分割](https://www.dell.com/support/kbdoc/zh-tw/000140692/how-do-i-know-what-partitions-to-create-when-installing-red-hat-linux-technical-tip-154224)
+
+1TB 硬碟分割配置
+
+| 裝置   | 類型    | 掛載點       | 大小     | 系統  | 格式化 | 備註 |
+|------|-------|-----------|--------|-----|-----| ---- |
+| sda1 | FAT32 | /boot/efi | 1.13GB |     | [x] | UEFI啟動
+| sda2 | Swap  |           | 16GB   | | [x] | swap不需要掛載點。作為虛擬記憶體用，用於內存不足時的緩衝; 記憶體如果很大，此時這個數值就可以設定少一點，甚至設定8GB即可。休眠也會用到此記憶體，如果不需要休眠功能，可以設定4GB甚至更小
+| sda3 | Ext4  | /         | 50GB   |     | [x] | Ext4是linux的系統檔 | 存放操作系统和应用程序文件
+| sda4 | Ext4  | /home     | 500GB  | | [x] | 存放使用者個人文件和配置文件，放在根分割之後可以避免系統更新或重裝時影響使用者數據
+| sda5 | Ext4  | /data     | 300GB  | | [x] | 分割適合儲存大文件或多媒體數據。通常放在最後，方便未來擴展，且可以隨時掛載或卸載
+
+> 剩餘133.07GB
+
+> UEFI 啟動 的系統一般來說只需要 /boot/efi，而不需要單獨的 /boot 分割區
+>
+> 如果你確定你的系統是 UEFI 並且沒有特殊需求（例如全盤加密或使用 LVM），只用 /boot/efi 就足夠了
+>
+> 因此，如果你使用的是現代的(2005之後) [UEFI](https://zh.wikipedia.org/zh-tw/%E7%B5%B1%E4%B8%80%E5%8F%AF%E5%BB%B6%E4%BC%B8%E9%9F%8C%E9%AB%94%E4%BB%8B%E9%9D%A2) 系統， /boot/efi 就可以滿足引導需求，沒有必要再創建單獨的 /boot 分割區
+
+![linux_splite_dirve](img/linux_splite_dirve.webp)
+
+![input_username](img/input_username.webp)
+
+![review](img/review.webp)
+
+![](img/timezone.webp)
+
+安裝好之後就可以關機
+
+關機的時候會跑到一個畫面，該畫面會提示你要把安裝的USB退出之後才可以關機
+
 
 ## ~~balenaEtcher~~ 不建議用，建議用Rufus
 
