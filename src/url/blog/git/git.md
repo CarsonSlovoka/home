@@ -3,8 +3,8 @@
   "title": "git",
   "tags": [ "git"],
   "layout": "blog/blog.base.gohtml",
-  "cTime": "2024-07-02T00:00:00+08:00",
-  "mTime": "2023-07-05T00:00:00+08:00"
+  "cTime": "2023-07-05T00:00:00+08:00",
+  "mTime": "2024-12-28T00:00:00+08:00"
 }
 ---
 
@@ -73,3 +73,41 @@ gitk <branch>
 gitk <tag>
 gitk <sha1>
 ```
+
+## git diff
+
+查看目前的檔案與當前結點間的差異
+
+```bash
+git diff path/to/myFile.sh
+```
+
+> 給的路徑可以是相對路徑即可，甚至如果你cd到該檔案的目錄，只接給檔案名稱即可
+
+---
+
+看到sha1~sha2該檔案被異動的情況
+
+```bash
+git diff sha1 sha2 -- path/to/myFile.sh
+```
+
+### gitk sha1 -- path/to/myFile
+
+你也可以
+
+```bash
+gitk sha1 -- path/to/myFile.sh
+```
+
+這樣會列出該檔案所有的歷史直到sha1為止，
+
+你可以再自己去找想要開始的sha，從那裡看起即可
+
+這種是針對如果你想要了解這個檔案的變動歷史有用
+
+而如果你只在意，你目前的檔案與某commit間的差異，還是建議用
+
+> `git diff sha1 sha2 -- myfile`
+
+的方式
